@@ -38,6 +38,23 @@ export default {
       errorHandler(error)
     })
   },
+  uploadFromCSVFile: function (path, file, callback, errorHandler) {
+    let targetPath = baseUrl + path
+    let formData = new FormData();
+    formData.append('file', file);
+    let config = {
+      headers: {
+        'content-type': 'multipart/form-data'
+      }
+    }
+    console.log(formData)
+
+    axios.post(targetPath, formData, config, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
   uploadFile: function (path, file, params, callback, errorHandler) {
     let targetPath = baseUrl + path
     let formData = new FormData()

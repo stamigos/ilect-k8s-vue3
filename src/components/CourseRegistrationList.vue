@@ -4,11 +4,26 @@
     <div class="row w-100">
       <course-side-bar :course-id="courseId"></course-side-bar>
       <div class="col-sm-9 pt-5">
-          <b-form @submit.prevent inline>
-            <div class="col-sm-3">
-                  <button v-if="user.role === 'lecturer'" type="button" class="btn btn-outline-info mr-3" v-b-modal.registration-modal>Add Registration</button>
+          <div class="alert alert-dismissible alert-success" v-show="registeredSuccess.length > 0">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4>Success: {{registeredSuccess.length}}</h4>
+            <hr>
+            <div class="scroll-bar" :class="isExpandSuccess ? 'no-max-height' : ''">
+              <strong v-for="r in registeredSuccess"><p>{{r}}</p></strong>
             </div>
-            <div class="col-sm-7">
+            <span @click="expandSuccess()" v-if="registeredSuccess.length > 4 && isExpandSuccess !== true" class="pointer" style="margin: 0 auto;"><i class='fas fa-angle-double-down'></i></span>
+          </div>
+          <div class="alert alert-dismissible alert-warning" v-show="registeredFailed.length > 0">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4>Warning: {{registeredFailed.length}} – Account already exists</h4>
+            <hr>
+            <div class="scroll-bar" :class="isExpandFailed ? 'no-max-height' : ''">
+              <strong v-for="r in registeredFailed"><p>{{r}}</p></strong>
+            </div>
+            <span @click="expandFailed()" v-if="registeredFailed.length > 4 && isExpandFailed !== true" class="pointer" style="margin: 0 auto;"><i class='fas fa-angle-double-down'></i></span>
+          </div>
+          <b-form @submit.prevent inline>
+            <div class="col-sm-5">
               <b-input-group>
                 <b-form-input id="form-search-input"
                        type="text"
@@ -22,6 +37,16 @@
                 </b-input-group-append>
               </b-input-group>
             </div>
+            <b-row class="col-sm-6">
+                <b-col>
+                  <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info"v-b-modal.registration-modal>Add Registration</b-button>
+                </b-col>
+                <b-col>
+                  <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info" @click="$refs.file.click()">Upload CSV
+                    <input type="file" ref="file" id="inputGroupFile01" v-on:change="handleFileUpload()" style="display: none;" aria-describedby="inputGroupFileAddon01">
+                  </b-button>
+                </b-col>
+            </b-row>
           </b-form>
           <div class="col-sm-10 pt-5">
             <div class="alert alert-dismissible alert-success" v-show="showAlert">
@@ -48,7 +73,7 @@
                   </a>
               </template>
             </b-table>
-            <div class="text-center" v-if="!isLoadMore">
+            <div class="text-center" v-if="!isLoadMore && filteredList.length > 5">
               <hr>
               <b-button variant="btn btn-info" @click="loadMore">Load more</b-button>
               <hr>
@@ -134,6 +159,8 @@ export default {
       showAlert: false,
       alertMessage: '',
       warningMessage: '',
+      registeredSuccess: [],
+      registeredFailed: [],
       registrations: [],
       sortBy: 'id',
       sortDesc: false,
@@ -155,7 +182,9 @@ export default {
         {value: 'lecturer', text: 'lecturer'},
         {value: 'student', text: 'student'}
       ],
-      roleSelected: null
+      roleSelected: null,
+      isExpandFailed: false,
+      isExpandSuccess: false,
     }
   },
   computed: {
@@ -176,6 +205,12 @@ export default {
     },
     loadMore () {
       this.isLoadMore = true
+    },
+    expandFailed () {
+      this.isExpandFailed = true
+    },
+    expandSuccess () {
+      this.isExpandSuccess = true
     },
     handleRegistrationsList (registrations) {
       if (registrations.length <= 5) {
@@ -259,6 +294,15 @@ export default {
         console.error(error)
       })
     },
+    handleFileUpload () {
+      this.file = this.$refs.file.files[0];
+      CourseService.registrationsFromCSV(this.courseId, this.file, (response) => {
+        console.log('registrationsFromCSV response:', response)
+        this.registeredSuccess = response.data.payload.result.registered_success
+        this.registeredFailed = response.data.payload.result.registered_failed
+        this.loadRegistrations()
+      })
+    },
     initForm () {
       this.addRegistrationForm.githubId = ''
     },
@@ -276,4 +320,23 @@ export default {
 </script>
 
 <style scoped>
+.scroll-bar {
+    max-height: 150px;
+    overflow-y: auto;
+}
+.alert {
+  text-align: center;
+}
+.alert h4 {
+  text-align: left;
+}
+.alert .scroll-bar {
+  text-align: left;
+}
+.no-max-height {
+  max-height: none !important;
+}
+.pointer {
+  cursor: pointer;
+}
 </style>

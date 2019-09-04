@@ -76,6 +76,15 @@ export default {
       errorHandler(error)
     })
   },
+  registrationsFromCSV: function(courseId, file, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/upload-csv`
+    ApiClient.uploadFromCSVFile(targetPath, file, (response) => {
+      console.log('rresponse:', response)
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
   updateAssignment: function (courseId, assignmentId, params, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/assignments/${assignmentId}`
     ApiClient.update(targetPath, params, (response) => {
