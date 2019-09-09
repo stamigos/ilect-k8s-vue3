@@ -113,7 +113,8 @@ export default {
   },
   methods: {
     startPod () {
-      let params = {user: this.userName}
+      const isGpu = (this.instanceType === 1) ? true : false
+      let params = {user: this.userName, is_gpu: isGpu}
       this.isLoadingStart = true
       PodService.startPod(this.courseId, params, (response) => {
         console.log(response)
