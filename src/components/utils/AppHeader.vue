@@ -15,7 +15,7 @@
 
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
-          <template slot="button-content"><em>Settings</em></template>
+          <template slot="button-content"><em>{{userName}}</em></template>
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#" @click="apiSignOut">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
@@ -93,6 +93,7 @@ export default {
     AuthService.updateToken(token)
     AuthService.authCheck((response) => {
       ApiClient.updateToken(token)
+      this.userName = response.data.username
       this.$store.commit('updateUser', response.data)
       this.$user.set(Object.assign(response.data))
       console.log(response)

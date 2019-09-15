@@ -208,6 +208,7 @@ export default {
       })
     },
     handleCourseClicked (course) {
+      this.$store.commit('COURSE_NAME', course.name)
       this.$router.push(`/courses/${course.id}`)
     }
   }

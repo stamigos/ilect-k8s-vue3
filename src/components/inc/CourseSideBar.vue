@@ -3,6 +3,9 @@
     <transition name="el-fade-in-linear">
       <div class="menu bg-light pt-5" v-show="!$store.state.sideBarFlag">
         <div class="menu-item">
+          <h3 v-if="course">{{course.name}}</h3>
+        </div>
+        <div class="menu-item">
           <eva-icon name="globe" animation="pulse" fill="#263238"></eva-icon>
           <router-link :to="`/courses/${courseId}`">
             <a style="color: #263238;" :class="$route.name === 'CourseOverview' ? 'active-link': null">Top</a>
@@ -51,12 +54,15 @@
 </template>
 
 <script>
+import CourseService from '../service/CourseService'
+
 export default {
   name: 'CourseSideBar',
-  props: [ 'courseId' ],
+  props: ['courseId'],
   data () {
     return {
-      isActive: false
+      isActive: false,
+      course: null,
     }
   },
   computed: {
@@ -71,13 +77,23 @@ export default {
       } else {
         this.$store.commit('updateSideBarFlag', true)
       }
-    }
+    },
+    loadCourse () {
+      CourseService.updateToken(this.$store.state.authHeader)
+      CourseService.getCourse(this.courseId, (response) => {
+        console.log('findCourses:', response)
+        this.course = response.data
+      }, (error) => {
+        console.error(error)
+      })
+    },
   },
   created () {
     console.log(this.courseId)
     if (this.$route.path.endsWith('/registrations')) {
       this.isActive = true
     }
+    this.loadCourse()
   }
 }
 </script>

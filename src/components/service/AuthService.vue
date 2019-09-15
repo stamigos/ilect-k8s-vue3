@@ -23,6 +23,18 @@ export default {
       errorHandler(error)
     })
   },
+  loginWithEmail: function (params, callback, errorHandler) {
+    let path = '/auth/login'
+    let targetPath = baseUrl + path
+    console.log(targetPath)
+    console.log(params)
+
+    axios.post(targetPath, params, {}).then((response) => {
+      callback(response)
+    }).catch(function (error) {
+      errorHandler(error)
+    })
+  },
   verifyApi: function (params, callback, errorHandler) {
     let path = '/auth/verify'
     let targetPath = baseUrl + path

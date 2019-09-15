@@ -30,7 +30,7 @@
                        name="search"
                        v-model="githubId"
                        autocomplete="off"
-                       placeholder="GitHub ID" >
+                       placeholder="GitHub ID">
                 </b-form-input>
                 <b-input-group-append>
                   <b-button disabled="disabled"><i class="fas fa-search"></i></b-button>
@@ -42,9 +42,18 @@
                   <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info"v-b-modal.registration-modal>Add Registration</b-button>
                 </b-col>
                 <b-col>
-                  <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info" @click="$refs.file.click()">Upload CSV
-                    <input type="file" ref="file" id="inputGroupFile01" v-on:change="handleFileUpload()" style="display: none;" aria-describedby="inputGroupFileAddon01">
-                  </b-button>
+                  <b-dropdown id="dropdown-buttons" text="Upload CSV..." variant="outline-info" class="m-2" style="margin:0 !important;">
+                    <b-dropdown-item-button>
+                      <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info" @click="$refs.fileGithub.click()">Github Users
+                        <input type="file" ref="fileGithub" id="inputGroupFile01" v-on:change="handleFileUploadGithub()" style="display: none;" aria-describedby="inputGroupFileAddon01">
+                      </b-button>
+                    </b-dropdown-item-button>
+                    <b-dropdown-item-button>
+                      <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info" @click="$refs.fileEmail.click()">Email Users
+                        <input type="file" ref="fileEmail" id="inputGroupFile02" v-on:change="handleFileUploadEmails()" style="display: none;" aria-describedby="inputGroupFileAddon01">
+                      </b-button>
+                    </b-dropdown-item-button>
+                  </b-dropdown>
                 </b-col>
             </b-row>
           </b-form>
@@ -53,13 +62,13 @@
               <button type="button" class="close" data-dismiss="alert">&times;</button>
               <strong>{{alertMessage}}</strong>
             </div>
+
             <b-table
               class="table-responsive"
               :items="handleRegistrationsList(filteredList)"
               :fields="fields"
               :sort-by.sync="sortBy"
               :sort-desc.sync="sortDesc"
-              @row-clicked="rowClicked"
             >
               <template slot="HEAD_actions" slot-scope="actions">
 
@@ -75,7 +84,7 @@
             </b-table>
             <div class="text-center" v-if="!isLoadMore && filteredList.length > 5">
               <hr>
-              <b-button variant="btn btn-info" @click="loadMore">Load more</b-button>
+              <b-button variant="btn btn-info" @click="loadMore">Load more (Total: {{filteredList.length}})</b-button>
               <hr>
             </div>
           </div>
@@ -200,9 +209,6 @@ export default {
   },
   components: {CourseSideBar, AppHeader},
   methods: {
-    rowClicked (row) {
-      this.$router.push(`/courses/${row.id}`)
-    },
     loadMore () {
       this.isLoadMore = true
     },
@@ -294,10 +300,19 @@ export default {
         console.error(error)
       })
     },
-    handleFileUpload () {
-      this.file = this.$refs.file.files[0];
-      CourseService.registrationsFromCSV(this.courseId, this.file, (response) => {
-        console.log('registrationsFromCSV response:', response)
+    handleFileUploadGithub () {
+      this.fileGithub = this.$refs.fileGithub.files[0];
+      CourseService.registrationsFromCSV(this.courseId, this.fileGithub, (response) => {
+        console.log('handleFileUploadGithub response:', response)
+        this.registeredSuccess = response.data.payload.result.registered_success
+        this.registeredFailed = response.data.payload.result.registered_failed
+        this.loadRegistrations()
+      })
+    },
+    handleFileUploadEmails () {
+      this.fileEmail = this.$refs.fileEmail.files[0];
+      CourseService.emailsFromCSV(this.courseId, this.fileEmail, (response) => {
+        console.log('handleFileUploadEmails response:', response)
         this.registeredSuccess = response.data.payload.result.registered_success
         this.registeredFailed = response.data.payload.result.registered_failed
         this.loadRegistrations()

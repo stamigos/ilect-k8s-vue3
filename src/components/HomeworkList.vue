@@ -3,7 +3,7 @@
     <app-header></app-header>
     <div class="row w-100">
       <course-side-bar :course-id="courseId"></course-side-bar>
-      <div class="col-sm-8 pt-5">
+      <div class="col-sm-10 pt-5">
         <div class="container">
             <p class="text-secondary header">Course Name</p>
             <p>{{course_name}}</p>
@@ -15,6 +15,14 @@
               :sort-desc.sync="sortDesc"
               @row-clicked="rowClicked"
             >
+              <template slot="HEAD_actions" slot-scope="actions">
+
+              </template>
+              <template slot="actions" slot-scope="actions">
+                  <a @click="goToLeaderBoard($event, actions.item)" class="text-info">
+                    Go to Leaderboard
+                  </a>
+              </template>
             </b-table>
         </div>
       </div>
@@ -42,7 +50,8 @@ export default {
         {key: 'description', sortable: true},
         {key: 'command', sortable: true},
         {key: 'deadline', sortable: true},
-        {key: 'submission_status', sortable: true}
+        {key: 'submission_status', sortable: true},
+        {key: 'actions', sortable: false}
       ],
       homeworkList: []
     }
@@ -51,6 +60,10 @@ export default {
     rowClicked (row) {
       console.log(row)
       this.$router.push(`/courses/${this.courseId}/homework/${row.id}`)
+    },
+    goToLeaderBoard (event, item) {
+      event.stopPropagation()
+      this.$router.push(`/courses/${this.courseId}/assignments/${item.id}/leaderboard`)
     },
     loadHomeworkList () {
       CourseService.findHomeworkList(this.courseId, (response) => {
