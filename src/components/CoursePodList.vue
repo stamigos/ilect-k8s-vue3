@@ -18,7 +18,7 @@ export default {
       courseId: ''
     }
   },
-  components: {CourseSideBar, AppHeader},
+  components: { CourseSideBar, AppHeader },
   created () {
     this.courseId = this.$route.params.courseId
   }

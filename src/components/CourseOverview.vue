@@ -94,16 +94,16 @@ export default {
         deadline: 20
       },
       extendOptions: [
-        {value: 10, text: '10 min'},
-        {value: 20, text: '20 min'},
-        {value: 60, text: '60 min'}
+        { value: 10, text: '10 min' },
+        { value: 20, text: '20 min' },
+        { value: 60, text: '60 min' }
       ],
       isLoadingStart: false,
       isLoadingStop: false,
       resttime: null,
       instanceOptions: [
-        {value: 0, text: 'CPU'},
-        {value: 1, text: 'GPU'}
+        { value: 0, text: 'CPU' },
+        { value: 1, text: 'GPU' }
       ],
       instanceType: 0
     }
@@ -113,30 +113,30 @@ export default {
   },
   methods: {
     startPod () {
-      let params = {user: this.userName}
+      const params = { user: this.userName }
       this.isLoadingStart = true
       PodService.startPod(this.courseId, params, (response) => {
         console.log(response)
         PodService.findRoutes(this.courseId, (routeRes) => {
           this.routes = routeRes.data
         })
-        var self = this;
+        var self = this
         var timerId = setTimeout(() => {
           PodService.findStatus(self.courseId, (podRes) => {
             console.log(podRes)
             self.podStatus = podRes.data.pod_status
             if (podRes.data.pod_status === 'Running') {
               self.isLoadingStart = false
-              clearInterval(timerId);
+              clearInterval(timerId)
             }
           }, (error) => {
             self.isLoadingStart = false
             this.errorFlag = true
             this.errorMessage = error.response.data.reason
-            clearInterval(timerId);
+            clearInterval(timerId)
             console.error(error)
           })
-         }, 5000);
+        }, 5000)
       }, (error) => {
         console.error(error)
         this.errorFlag = true
@@ -144,7 +144,7 @@ export default {
       })
     },
     stopPod () {
-      let params = {user: this.userName}
+      const params = { user: this.userName }
       PodService.stopPod(this.courseId, params, (response) => {
         console.log(response)
         PodService.findRoutes(this.courseId, (routeRes) => {
@@ -160,7 +160,7 @@ export default {
         console.error(error)
       })
     },
-    getResttime() {
+    getResttime () {
       PodService.getResttime(this.courseId, (response) => {
         console.log(response)
         this.resttime = response.data.payload.resttime
@@ -170,7 +170,7 @@ export default {
     },
     extend (evt) {
       evt.preventDefault()
-      let params = {
+      const params = {
         deadline: this.updateRegistrationForm.deadline
       }
       CourseService.extendDeadline(this.courseId, params, (response) => {

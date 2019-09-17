@@ -16,7 +16,7 @@ export default {
     ApiClient.updateToken(this.token)
   },
   authCheck: function (callback, errorHandler) {
-    let targetPath = `/is-authenticated`
+    const targetPath = '/is-authenticated'
     ApiClient.search(targetPath, (response) => {
       callback(response)
     }, (error) => {
@@ -24,8 +24,8 @@ export default {
     })
   },
   loginWithEmail: function (params, callback, errorHandler) {
-    let path = '/auth/login'
-    let targetPath = baseUrl + path
+    const path = '/auth/login'
+    const targetPath = baseUrl + path
     console.log(targetPath)
     console.log(params)
 
@@ -36,8 +36,8 @@ export default {
     })
   },
   verifyApi: function (params, callback, errorHandler) {
-    let path = '/auth/verify'
-    let targetPath = baseUrl + path
+    const path = '/auth/verify'
+    const targetPath = baseUrl + path
     console.log(targetPath)
     console.log(params)
 
@@ -48,7 +48,7 @@ export default {
     })
   },
   signOut: function (callback, errorHandler) {
-    let targetPath = `${baseUrl}/auth/logout`
+    const targetPath = `${baseUrl}/auth/logout`
     axios.get(targetPath).then((response) => {
       console.log('response:', response)
       callback(response)

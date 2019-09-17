@@ -48,9 +48,9 @@ export default {
       sortBy: 'username',
       sortDesc: false,
       fields: [
-        {key: 'crown', sortable: false},
-        {key: 'username', sortable: true},
-        {key: 'score', sortable: true}
+        { key: 'crown', sortable: false },
+        { key: 'username', sortable: true },
+        { key: 'score', sortable: true }
       ],
       submissions: [],
       courseId: '',

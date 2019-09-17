@@ -50,10 +50,10 @@ export default {
     loginWithEmail () {
       AuthService.loginWithEmail(this.form, (response) => {
         console.log('response:', response)
-        let token = response.data.token
+        const token = response.data.token
         console.log('token:', token)
         // this.$cookies.set('token', token, null, null, '*.v2.ilect.net')
-        if (response.data.message === "Ok") {
+        if (response.data.message === 'Ok') {
           this.$store.commit('updateAuthHeader', `Bearer ${token}`)
           ApiClient.updateToken(token)
           this.$router.replace('/dashboard')

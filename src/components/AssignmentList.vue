@@ -98,12 +98,12 @@ export default {
       sortBy: 'id',
       sortDesc: false,
       fields: [
-        {key: 'id', sortable: true},
-        {key: 'name', sortable: true},
-        {key: 'description', sortable: true},
-        {key: 'command', sortable: true},
-        {key: 'deadline', sortable: true},
-        {key: 'leader_board', sortable: true}
+        { key: 'id', sortable: true },
+        { key: 'name', sortable: true },
+        { key: 'description', sortable: true },
+        { key: 'command', sortable: true },
+        { key: 'deadline', sortable: true },
+        { key: 'leader_board', sortable: true }
       ],
       assignments: [],
       form: {
@@ -120,7 +120,7 @@ export default {
     toggleDisplayLeaderboard (e, item) {
       event.stopPropagation()
       item.show_lb = !item.show_lb
-      let params = {
+      const params = {
         show_lb: item.show_lb
       }
       CourseService.updateAssignment(this.courseId, item.id, params, (response) => {
@@ -147,7 +147,7 @@ export default {
       evt.preventDefault()
       this.$refs.addAssignmentModal.hide()
       console.log(this.form)
-      let params = this.form
+      const params = this.form
       CourseService.createAssignment(this.courseId, params, (response) => {
         console.log(response)
         this.createSuccess = true

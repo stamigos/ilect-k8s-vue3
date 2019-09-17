@@ -9,10 +9,10 @@ export default {
     return {}
   },
   updateToken: function (token) {
-    axios.defaults.headers.common['HTTP_AUTHORIZATION'] = token
+    axios.defaults.headers.common.HTTP_AUTHORIZATION = token
   },
   find: function (path, id, callback, errorHandler) {
-    let targetPath = baseUrl + path + id
+    const targetPath = baseUrl + path + id
 
     axios.get(targetPath).then((response) => {
       callback(response)
@@ -21,7 +21,7 @@ export default {
     })
   },
   search: function (pathWithQuery, callback, errorHandler, params) {
-    let targetPath = baseUrl + pathWithQuery
+    const targetPath = baseUrl + pathWithQuery
 
     axios.get(targetPath, params).then((response) => {
       callback(response)
@@ -30,7 +30,7 @@ export default {
     })
   },
   update: function (path, params, callback, errorHandler) {
-    let targetPath = baseUrl + path
+    const targetPath = baseUrl + path
 
     axios.put(targetPath, params).then((response) => {
       callback(response)
@@ -39,10 +39,10 @@ export default {
     })
   },
   uploadFromCSVFile: function (path, file, callback, errorHandler) {
-    let targetPath = baseUrl + path
-    let formData = new FormData();
-    formData.append('file', file);
-    let config = {
+    const targetPath = baseUrl + path
+    const formData = new FormData()
+    formData.append('file', file)
+    const config = {
       headers: {
         'content-type': 'multipart/form-data'
       }
@@ -56,10 +56,10 @@ export default {
     })
   },
   uploadFile: function (path, file, params, callback, errorHandler) {
-    let targetPath = baseUrl + path
-    let formData = new FormData()
+    const targetPath = baseUrl + path
+    const formData = new FormData()
     formData.append('product_data', file)
-    let config = {
+    const config = {
       headers: {
         'content-type': 'multipart/form-data'
       }
@@ -74,7 +74,7 @@ export default {
     })
   },
   create: function (path, params, callback, errorHandler) {
-    let targetPath = baseUrl + path
+    const targetPath = baseUrl + path
     console.log(params)
     console.log(targetPath)
 
@@ -85,7 +85,7 @@ export default {
     })
   },
   destroy: function (path, id, callback, errorHandler) {
-    let targetPath = baseUrl + path + '/' + id
+    const targetPath = baseUrl + path + '/' + id
 
     axios.delete(targetPath).then((response) => {
       callback(response)
@@ -95,7 +95,7 @@ export default {
   },
   // TODO refactor to use HTTP Methods configurations
   destroyWithPath: function (path, callback, errorHandler) {
-    let targetPath = baseUrl + path
+    const targetPath = baseUrl + path
 
     axios.delete(targetPath).then((response) => {
       callback(response)

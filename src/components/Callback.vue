@@ -9,13 +9,13 @@ import ApiClient from './utils/ApiClient'
 export default {
   name: 'Callback',
   created () {
-    let oauthCode = this.$route.query.code
-    let params = {
+    const oauthCode = this.$route.query.code
+    const params = {
       code: oauthCode
     }
     const self = this
     AuthService.verifyApi(params, (response) => {
-      let token = response.data.token
+      const token = response.data.token
       this.$store.commit('updateGitHubCode', oauthCode)
       this.$store.commit('updateAuthHeader', `Bearer ${token}`)
       // this.$cookies.set('token', token, null, null, '*.v2.ilect.net')

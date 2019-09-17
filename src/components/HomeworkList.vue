@@ -45,13 +45,13 @@ export default {
       sortBy: 'id',
       sortDesc: false,
       fields: [
-        {key: 'id', sortable: true},
-        {key: 'name', sortable: true},
-        {key: 'description', sortable: true},
-        {key: 'command', sortable: true},
-        {key: 'deadline', sortable: true},
-        {key: 'submission_status', sortable: true},
-        {key: 'actions', sortable: false}
+        { key: 'id', sortable: true },
+        { key: 'name', sortable: true },
+        { key: 'description', sortable: true },
+        { key: 'command', sortable: true },
+        { key: 'deadline', sortable: true },
+        { key: 'submission_status', sortable: true },
+        { key: 'actions', sortable: false }
       ],
       homeworkList: []
     }

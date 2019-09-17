@@ -54,7 +54,7 @@ export default {
     startPod () {
       alert('start pods!')
       this.isNavHide = false
-      let params = {user: this.userName}
+      const params = { user: this.userName }
       PodService.startPod(this.courseId, params, (response) => {
         console.log(response)
         PodService.findRoutes(this.courseId, (routeRes) => {
@@ -72,7 +72,7 @@ export default {
     },
     stopPod () {
       alert('start pods!')
-      let params = {user: this.userName}
+      const params = { user: this.userName }
       this.isNavHide = false
       PodService.stopPod(this.courseId, params, (response) => {
         console.log(response)
@@ -89,7 +89,7 @@ export default {
     }
   },
   created () {
-    let token = this.$store.state.authHeader
+    const token = this.$store.state.authHeader
     AuthService.updateToken(token)
     AuthService.authCheck((response) => {
       ApiClient.updateToken(token)

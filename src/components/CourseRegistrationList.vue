@@ -174,12 +174,12 @@ export default {
       sortBy: 'id',
       sortDesc: false,
       fields: [
-        {key: 'id', sortable: true},
-        {key: 'user_name', sortable: true},
-        {key: 'role', sortable: true},
-        {key: 'acc_runtime', sortable: true},
-        {key: 'active', sortable: true},
-        {key: 'actions', sortable: false}
+        { key: 'id', sortable: true },
+        { key: 'user_name', sortable: true },
+        { key: 'role', sortable: true },
+        { key: 'acc_runtime', sortable: true },
+        { key: 'active', sortable: true },
+        { key: 'actions', sortable: false }
       ],
       addRegistrationForm: {
         githubId: null
@@ -188,12 +188,12 @@ export default {
         is_active: null
       },
       roles: [
-        {value: 'lecturer', text: 'lecturer'},
-        {value: 'student', text: 'student'}
+        { value: 'lecturer', text: 'lecturer' },
+        { value: 'student', text: 'student' }
       ],
       roleSelected: null,
       isExpandFailed: false,
-      isExpandSuccess: false,
+      isExpandSuccess: false
     }
   },
   computed: {
@@ -207,7 +207,7 @@ export default {
       return this.$store.state.user
     }
   },
-  components: {CourseSideBar, AppHeader},
+  components: { CourseSideBar, AppHeader },
   methods: {
     loadMore () {
       this.isLoadMore = true
@@ -233,7 +233,7 @@ export default {
     createRegistration (evt) {
       evt.preventDefault()
       this.$refs.addRegistrationModal.hide()
-      let params = {
+      const params = {
         account_name: this.addRegistrationForm.githubId
       }
       CourseService.addRegistration(this.courseId, params, (response) => {
@@ -274,7 +274,7 @@ export default {
     updateRegistration (evt) {
       evt.preventDefault()
       this.$refs.updateRegistrationModal.hide()
-      let params = {
+      const params = {
         is_active: Boolean(this.updateRegistrationForm.is_active),
         role: this.roleSelected
       }
@@ -301,7 +301,7 @@ export default {
       })
     },
     handleFileUploadGithub () {
-      this.fileGithub = this.$refs.fileGithub.files[0];
+      this.fileGithub = this.$refs.fileGithub.files[0]
       CourseService.registrationsFromCSV(this.courseId, this.fileGithub, (response) => {
         console.log('handleFileUploadGithub response:', response)
         this.registeredSuccess = response.data.payload.result.registered_success
@@ -310,7 +310,7 @@ export default {
       })
     },
     handleFileUploadEmails () {
-      this.fileEmail = this.$refs.fileEmail.files[0];
+      this.fileEmail = this.$refs.fileEmail.files[0]
       CourseService.emailsFromCSV(this.courseId, this.fileEmail, (response) => {
         console.log('handleFileUploadEmails response:', response)
         this.registeredSuccess = response.data.payload.result.registered_success

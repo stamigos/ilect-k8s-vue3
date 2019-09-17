@@ -62,7 +62,7 @@ export default {
   data () {
     return {
       isActive: false,
-      course: null,
+      course: null
     }
   },
   computed: {
@@ -86,7 +86,7 @@ export default {
       }, (error) => {
         console.error(error)
       })
-    },
+    }
   },
   created () {
     console.log(this.courseId)
