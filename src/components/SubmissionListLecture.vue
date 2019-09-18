@@ -60,9 +60,9 @@ export default {
       sortBy: 'username',
       sortDesc: false,
       fields: [
-        {key: 'username', sortable: true},
-        {key: 'score', sortable: true},
-        {key: 'score_all', sortable: false}
+        { key: 'username', sortable: true },
+        { key: 'score', sortable: true },
+        { key: 'score_all', sortable: false }
       ],
       submissions: [],
       searchUser: '',

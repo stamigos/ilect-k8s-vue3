@@ -38,7 +38,7 @@ export default {
     return {
       courseId: '',
       assignmentId: '',
-      content: ``,
+      content: '',
       assignment_name: null,
       submission: {
         user_id: null,
@@ -100,7 +100,7 @@ export default {
     addSubmission () {
       console.log('create')
       console.log(this.content)
-      let params = {
+      const params = {
         content: this.content
       }
       CourseService.addSubmission(this.courseId, this.assignmentId, params, (response) => {

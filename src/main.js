@@ -29,7 +29,7 @@ Vue.use(VueCookies)
 
 Vue.use(VueRouterPermissions, router)
 
-let authenticate = Promise.resolve({ role: 'guest' })
+const authenticate = Promise.resolve({ role: 'guest' })
 
 const store = new Vuex.Store({
   state: {

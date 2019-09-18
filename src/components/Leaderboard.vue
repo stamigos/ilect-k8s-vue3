@@ -6,8 +6,8 @@
       <div class="col-sm-8 pt-5">
         <div class="container">
           <div>
-            <p class="text-secondary header">Assignment name</p>
-            <p>{{assignmentId}}</p>
+            <p class="text-secondary header" v-if="assignment_name">Assignment name</p>
+            <p v-if="assignment_name">{{assignment_name}}</p>
             <div class="pt-3">
               <b-table
                 class="table-responsive"
@@ -15,7 +15,6 @@
                 :fields="fields"
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
-                @row-clicked="scoreSubmission"
               >
               <template slot="HEAD_crown" slot-scope="data">
                 <span></span>
@@ -49,12 +48,13 @@ export default {
       sortBy: 'username',
       sortDesc: false,
       fields: [
-        {key: 'crown', sortable: false},
-        {key: 'username', sortable: true},
-        {key: 'score', sortable: true}
+        { key: 'crown', sortable: false },
+        { key: 'username', sortable: true },
+        { key: 'score', sortable: true }
       ],
       submissions: [],
-      courseId: ''
+      courseId: '',
+      assignment_name: null
     }
   },
   methods: {
@@ -82,6 +82,7 @@ export default {
         this.submissions.forEach((item) => {
           item.color = this.getRandomColor()
         })
+        this.assignment_name = response.data.payload.assignment_name
       }, (error) => {
         console.error(error)
       })

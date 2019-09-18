@@ -15,7 +15,7 @@
           <p class="logs">{{submission.output}}</p>
           <p class="text-secondary header">Add Your Submission</p>
           <div class="editor-submission">
-            <editor id="editor" v-model="content" @init="editorInit" lang="python" theme="dracula" width="750px" height="300px"></editor>
+            <editor id="editor" v-model="content" minLines="5" maxLines="10" showGutter="true" showLineNumbers="false" @init="editorInit" lang="python" theme="dracula" width="750px" height="300px"></editor>
           </div>
           <button class="btn btn-info button-submission" v-on:click="addSubmission">Save</button>
         </div>
@@ -94,7 +94,7 @@ export default {
     addSubmission () {
       console.log('create')
       console.log(this.content)
-      let params = {
+      const params = {
         content: this.content
       }
       CourseService.addSubmission(this.courseId, this.assignmentId, params, (response) => {

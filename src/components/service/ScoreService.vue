@@ -23,7 +23,7 @@ export default {
   },
   scoreSubmissions: function (courseId, assignmentId, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/score/assignments/${assignmentId}/submissions`
-    let params = {}
+    const params = {}
     ApiClient.create(targetPath, params, (response) => {
       callback(response)
     }, (error) => {

@@ -15,7 +15,7 @@
 
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
-          <template slot="button-content"><em>Settings</em></template>
+          <template slot="button-content"><em>{{userName}}</em></template>
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#" @click="apiSignOut">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
@@ -54,7 +54,7 @@ export default {
     startPod () {
       alert('start pods!')
       this.isNavHide = false
-      let params = {user: this.userName}
+      const params = { user: this.userName }
       PodService.startPod(this.courseId, params, (response) => {
         console.log(response)
         PodService.findRoutes(this.courseId, (routeRes) => {
@@ -72,7 +72,7 @@ export default {
     },
     stopPod () {
       alert('start pods!')
-      let params = {user: this.userName}
+      const params = { user: this.userName }
       this.isNavHide = false
       PodService.stopPod(this.courseId, params, (response) => {
         console.log(response)
@@ -89,10 +89,11 @@ export default {
     }
   },
   created () {
-    let token = this.$store.state.authHeader
+    const token = this.$store.state.authHeader
     AuthService.updateToken(token)
     AuthService.authCheck((response) => {
       ApiClient.updateToken(token)
+      this.userName = response.data.username
       this.$store.commit('updateUser', response.data)
       this.$user.set(Object.assign(response.data))
       console.log(response)

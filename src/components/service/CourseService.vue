@@ -13,7 +13,15 @@ export default {
     ApiClient.updateToken(this.token)
   },
   findCourses: function (callback, errorHandler) {
-    const targetPath = `/courses`
+    const targetPath = '/courses'
+    ApiClient.search(targetPath, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
+  getCourse: function (courseId, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}`
     ApiClient.search(targetPath, (response) => {
       callback(response)
     }, (error) => {
@@ -21,7 +29,7 @@ export default {
     })
   },
   createCourse: function (params, callback, errorHandler) {
-    const targetPath = `/courses`
+    const targetPath = '/courses'
     ApiClient.create(targetPath, params, (response) => {
       callback(response)
     }, (error) => {
@@ -76,8 +84,17 @@ export default {
       errorHandler(error)
     })
   },
-  registrationsFromCSV: function(courseId, file, callback, errorHandler) {
-    const targetPath = `/courses/${courseId}/upload-csv`
+  registrationsFromCSV: function (courseId, file, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/upload-github-csv`
+    ApiClient.uploadFromCSVFile(targetPath, file, (response) => {
+      console.log('rresponse:', response)
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
+  emailsFromCSV: function (courseId, file, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/upload-emails-csv`
     ApiClient.uploadFromCSVFile(targetPath, file, (response) => {
       console.log('rresponse:', response)
       callback(response)

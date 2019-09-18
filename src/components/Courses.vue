@@ -118,11 +118,11 @@ export default {
       sortBy: 'name',
       sortDesc: false,
       fields: [
-        {key: 'name', sortable: true},
-        {key: 'description', sortable: true},
-        {key: 'start', sortable: true},
-        {key: 'end', sortable: true},
-        {key: 'notifications', sortable: false}
+        { key: 'name', sortable: true },
+        { key: 'description', sortable: true },
+        { key: 'start', sortable: true },
+        { key: 'end', sortable: true },
+        { key: 'notifications', sortable: false }
       ],
       courses: [],
       clicked: false,
@@ -187,7 +187,7 @@ export default {
       evt.preventDefault()
       this.$refs.addCourseModal.hide()
       console.log(this.addCourseForm)
-      let params = this.addCourseForm
+      const params = this.addCourseForm
       CourseService.createCourse(params, (response) => {
         console.log(response)
         this.createSuccess = true
@@ -208,6 +208,7 @@ export default {
       })
     },
     handleCourseClicked (course) {
+      this.$store.commit('COURSE_NAME', course.name)
       this.$router.push(`/courses/${course.id}`)
     }
   }
