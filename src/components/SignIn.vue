@@ -3,6 +3,10 @@
       <div class="card login-form">
         <div class="card-body">
             <div class="login-form-btn text-center">
+              <div class="alert alert-dismissible alert-danger" v-show="loginError">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Email/Password is incorrect.</strong>
+              </div>
               <button class="btn btn-info btn-github" v-on:click="goToGitHubAuth">
                 <i class="fab fa-github"></i>
                 Login with GitHub
@@ -39,7 +43,8 @@ export default {
       form: {
         email: '',
         password: ''
-      }
+      },
+      loginError: null,
     }
   },
   methods: {
@@ -58,12 +63,13 @@ export default {
           ApiClient.updateToken(token)
           this.$router.replace('/dashboard')
         } else {
-          self.$router.replace('/sign-in')
+          this.loginError = true
+          this.$router.replace('/sign-in')
         }
       }, (error) => {
         console.log(error)
-        alert(error)
-        self.$router.replace('/sign-in')
+        this.loginError = true
+        this.$router.replace('/sign-in')
       })
     }
   },

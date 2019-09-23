@@ -24,7 +24,7 @@ export default {
     }, (error) => {
       console.log(error)
       alert(error)
-      self.$router.replace('/sign-in')
+      this.$router.replace('/sign-in')
     })
   }
 }

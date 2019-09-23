@@ -84,6 +84,14 @@ export default {
       errorHandler(error)
     })
   },
+  updateRegistrationPassword: function (courseId, userId, params, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/registrations/${userId}/change-password`
+    ApiClient.update(targetPath, params, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
   registrationsFromCSV: function (courseId, file, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/upload-github-csv`
     ApiClient.uploadFromCSVFile(targetPath, file, (response) => {
@@ -95,8 +103,8 @@ export default {
   },
   emailsFromCSV: function (courseId, file, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/upload-emails-csv`
+    console.log('emailsFromCSV')
     ApiClient.uploadFromCSVFile(targetPath, file, (response) => {
-      console.log('rresponse:', response)
       callback(response)
     }, (error) => {
       errorHandler(error)

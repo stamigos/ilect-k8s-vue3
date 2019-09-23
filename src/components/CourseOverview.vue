@@ -20,18 +20,23 @@
             </b-col>
           </b-row>
           <hr>
-          <b-row class="col-sm-4">
+          <b-row class="col-sm-8">
             <b-col>
-              <b-button-group>
-                <button class="btn btn-info btn-lg" v-on:click="startPod">
-                  <span v-if="!isLoadingStart">Start</span>
-                  <b-spinner v-if="isLoadingStart" variant="primary" label="Spinning"></b-spinner>
-                </button>
-                <button class="btn btn-danger btn-lg" v-on:click="stopPod">
-                  <span v-if="!isLoadingStop">Stop</span>
-                  <b-spinner v-if="isLoadingStop" variant="primary" label="Spinning"></b-spinner>
-                </button>
-              </b-button-group>
+              <div class="d-inline-block">
+                <b-button-group>
+                  <button class="btn btn-info btn-lg" v-on:click="startPod">
+                    <span v-if="!isLoadingStart">Start</span>
+                    <b-spinner v-if="isLoadingStart" variant="primary" label="Spinning"></b-spinner>
+                  </button>
+                  <button class="btn btn-danger btn-lg" v-on:click="stopPod">
+                    <span v-if="!isLoadingStop">Stop</span>
+                    <b-spinner v-if="isLoadingStop" variant="primary" label="Spinning"></b-spinner>
+                  </button>
+                </b-button-group>
+              </div>
+              <div class="d-inline-block ml-2">
+                <b-badge variant="warning" v-if="podStatus !== '{}'">Status: <span v-if="statusLoading">{{ podStatus }}</span><b-spinner v-if="!statusLoading" variant="primary" type="grow" small label="Spinning"></b-spinner></b-badge>
+              </div>
             </b-col>
           </b-row>
           <hr>
@@ -100,6 +105,7 @@ export default {
       ],
       isLoadingStart: false,
       isLoadingStop: false,
+      statusLoading: false,
       resttime: null,
       instanceOptions: [
         { value: 0, text: 'CPU' },
@@ -110,6 +116,7 @@ export default {
   },
   mounted () {
     this.getResttime()
+    this.getStatus()
   },
   methods: {
     startPod () {
@@ -169,6 +176,17 @@ export default {
         console.error(error)
       })
     },
+    getStatus () {
+      PodService.findStatus(this.courseId, (podRes) => {
+        console.log(podRes)
+        this.podStatus = podRes.data.pod_status
+        this.statusLoading = true
+      }, (error) => {
+        this.errorFlag = true
+        this.errorMessage = error.response.data.reason
+        console.error(error)
+      })
+    },
     extend (evt) {
       evt.preventDefault()
       const params = {
@@ -189,10 +207,6 @@ export default {
     PodService.findStatus(this.courseId, (podRes) => {
       console.log('podRes:', podRes)
       this.podStatus = podRes.data.pod_status
-      PodService.findRoutes(this.courseId, (routeRes) => {
-        console.log(routeRes)
-        this.routes = routeRes.data
-      })
     }, (error) => {
       console.error(error)
     })

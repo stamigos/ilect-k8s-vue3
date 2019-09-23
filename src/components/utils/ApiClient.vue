@@ -48,8 +48,7 @@ export default {
       }
     }
     console.log(formData)
-
-    axios.post(targetPath, formData, config, (response) => {
+    axios.post(targetPath, formData, config).then((response) => {
       callback(response)
     }, (error) => {
       errorHandler(error)
@@ -67,7 +66,7 @@ export default {
     console.log(formData)
     console.log(params)
 
-    axios.post(targetPath, formData, config, (response) => {
+    axios.post(targetPath, formData, config).then((response) => {
       callback(response)
     }, (error) => {
       errorHandler(error)

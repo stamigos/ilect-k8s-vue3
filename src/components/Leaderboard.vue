@@ -76,7 +76,7 @@ export default {
       return color
     },
     loadSubmissions () {
-      ScoreService.scoreSubmissions(this.courseId, this.assignmentId, (response) => {
+      ScoreService.loadSubmissions(this.courseId, this.assignmentId, (response) => {
         console.log(response)
         this.submissions = response.data.payload.submission
         this.submissions.forEach((item) => {

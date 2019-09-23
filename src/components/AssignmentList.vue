@@ -19,7 +19,7 @@
             >
               <template slot="leader_board" slot-scope="leader_board">
                 <div @click="toggleDisplayLeaderboard($event, leader_board.item)">
-                  <i class="fa fa-eye" v-if="leader_board.item.show_lb" aria-hidden="true"></i>
+                  <i class="fa fa-eye" v-if="leader_board.item.show_lb === true" aria-hidden="true"></i>
                   <i class="fa fa-eye-slash" v-else="" aria-hidden="true"></i>
                 </div>
               </template>
@@ -118,10 +118,9 @@ export default {
   },
   methods: {
     toggleDisplayLeaderboard (e, item) {
-      event.stopPropagation()
-      item.show_lb = !item.show_lb
+      e.stopPropagation()
       const params = {
-        show_lb: item.show_lb
+        show_lb: !item.show_lb
       }
       CourseService.updateAssignment(this.courseId, item.id, params, (response) => {
         console.log(response)

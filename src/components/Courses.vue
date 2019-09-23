@@ -98,7 +98,7 @@
             </flat-pickr>
         </b-form-group>
         <b-button type="submit" variant="primary">Submit</b-button>
-        <b-button type="reset" variant="danger">Reset</b-button>
+        <b-button type="reset" class="mr-3" variant="danger">Reset</b-button>
       </b-form>
     </b-modal>
   </div>
@@ -109,6 +109,7 @@ import flatPickr from 'vue-flatpickr-component'
 import 'flatpickr/dist/flatpickr.css'
 import AppHeader from './utils/AppHeader'
 import CourseService from './service/CourseService'
+import Loader from '@/components/Loader'
 
 export default {
   name: 'Courses',

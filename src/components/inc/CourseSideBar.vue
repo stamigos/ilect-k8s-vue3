@@ -1,9 +1,12 @@
 <template>
   <div class="col-sm-2">
     <transition name="el-fade-in-linear">
-      <div class="menu bg-light pt-5" v-show="!$store.state.sideBarFlag">
+      <div class="menu bg-light pt-4" v-show="!$store.state.sideBarFlag">
         <div class="menu-item">
-          <h3 v-if="course">{{course.name}}</h3>
+          <h5 v-if="course" id="tooltip-target-1">{{text_truncate(course.name, 16, '...')}}</h5>
+            <b-tooltip v-if="course" target="tooltip-target-1" triggers="hover">
+              {{course.name}}
+            </b-tooltip>
         </div>
         <div class="menu-item">
           <eva-icon name="globe" animation="pulse" fill="#263238"></eva-icon>
@@ -86,6 +89,19 @@ export default {
       }, (error) => {
         console.error(error)
       })
+    },
+    text_truncate (str, length, ending) {
+      if (length == null) {
+        length = 100
+      }
+      if (ending == null) {
+        ending = '...'
+      }
+      if (str.length > length) {
+        return str.substring(0, length - ending.length) + ending
+      } else {
+        return str
+      }
     }
   },
   created () {
@@ -105,6 +121,9 @@ export default {
     flex-direction: row;
     height: 100vh;
     width: 15vw;
+  }
+  #tooltip-target-1 {
+    cursor: pointer;
   }
   @media (min-width: 320px) and (max-width: 480px) {
     .menu {

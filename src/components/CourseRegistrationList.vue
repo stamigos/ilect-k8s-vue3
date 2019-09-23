@@ -1,24 +1,25 @@
 <template>
   <div id="">
+    <Loader v-if='isLoading' :load='isLoading'/>
     <app-header></app-header>
     <div class="row w-100">
       <course-side-bar :course-id="courseId"></course-side-bar>
       <div class="col-sm-9 pt-5">
           <div class="alert alert-dismissible alert-success" v-show="registeredSuccess.length > 0">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <button type="button" class="close" @click="closeAlertSuccess()">&times;</button>
             <h4>Success: {{registeredSuccess.length}}</h4>
             <hr>
             <div class="scroll-bar" :class="isExpandSuccess ? 'no-max-height' : ''">
-              <strong v-for="r in registeredSuccess"><p>{{r}}</p></strong>
+              <strong v-for="(r, index) in registeredSuccess" :key="index"><p>{{r}}</p></strong>
             </div>
             <span @click="expandSuccess()" v-if="registeredSuccess.length > 4 && isExpandSuccess !== true" class="pointer" style="margin: 0 auto;"><i class='fas fa-angle-double-down'></i></span>
           </div>
           <div class="alert alert-dismissible alert-warning" v-show="registeredFailed.length > 0">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <button type="button" class="close" @click="closeAlertFailed()">&times;</button>
             <h4>Warning: {{registeredFailed.length}} – Account already exists</h4>
             <hr>
             <div class="scroll-bar" :class="isExpandFailed ? 'no-max-height' : ''">
-              <strong v-for="r in registeredFailed"><p>{{r}}</p></strong>
+              <strong v-for="(r, index) in registeredFailed" :key="index"><p>{{r}}</p></strong>
             </div>
             <span @click="expandFailed()" v-if="registeredFailed.length > 4 && isExpandFailed !== true" class="pointer" style="margin: 0 auto;"><i class='fas fa-angle-double-down'></i></span>
           </div>
@@ -39,7 +40,7 @@
             </div>
             <b-row class="col-sm-6">
                 <b-col>
-                  <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info"v-b-modal.registration-modal>Add Registration</b-button>
+                  <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info" v-b-modal.registration-modal>Add Registration</b-button>
                 </b-col>
                 <b-col>
                   <b-dropdown id="dropdown-buttons" text="Upload CSV..." variant="outline-info" class="m-2" style="margin:0 !important;">
@@ -74,17 +75,25 @@
 
               </template>
               <template slot="actions" slot-scope="data">
-                  <a @click="selectRegistration($event, data.item)" v-b-modal.update-registration-modal>
+                  <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.update-registration-modal>
                     <i class="fas fa-edit text-primary"></i>
                   </a>
-                  <a @click="selectRegistration($event, data.item)" v-b-modal.delete-registration-modal>
+                  <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.delete-registration-modal>
                     <i class="fas fa-trash-alt text-danger"></i>
+                  </a>
+                  <a class="mr-2" v-if="data.item.provider === 'Email'" @click="selectRegistration($event, data.item)" v-b-modal.change-password-modal>
+                    <i class="fas fa-lock text-secondary"></i>
                   </a>
               </template>
             </b-table>
             <div class="text-center" v-if="!isLoadMore && filteredList.length > 5">
               <hr>
               <b-button variant="btn btn-info" @click="loadMore">Load more (Total: {{filteredList.length}})</b-button>
+              <hr>
+            </div>
+            <div class="text-center" v-if="isLoadMore && filteredList.length > 5">
+              <hr>
+              <b-button variant="btn btn-info" @click="collapse">Collapse (Total: {{filteredList.length}})</b-button>
               <hr>
             </div>
           </div>
@@ -106,10 +115,52 @@
                           placeholder="Enter github ID">
             </b-form-input>
         </b-form-group>
-        <b-button type="submit" variant="primary">Submit</b-button>
+        <b-button type="submit" variant="primary" class="mr-2">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
     </b-modal>
+
+    <!-- change password modal -->
+    <b-modal ref="changePasswordModal"
+             id="change-password-modal"
+             title="Change password"
+             hide-footer>
+      <b-form @submit="changePassword" @reset="onResetUpdatePassword" class="w-100">
+        <b-form-group id="form-old-password-group"
+                      label="Old Password:"
+                      label-for="form-old-password-input">
+            <b-form-input id="form-old-password-input"
+                          type="password"
+                          v-model="changePasswordForm.old_password"
+                          required
+                          placeholder="Old Password">
+            </b-form-input>
+        </b-form-group>
+        <b-form-group id="form-name-group"
+                      label="New Password:"
+                      label-for="form-name-input">
+            <b-form-input id="form-name-input"
+                          type="password"
+                          v-model="changePasswordForm.new_password"
+                          required
+                          placeholder="New Password">
+            </b-form-input>
+        </b-form-group>
+        <b-form-group id="form-repeat-password-group"
+                      label="Repeat Password:"
+                      label-for="form-repeat-password-input">
+            <b-form-input id="form-repeat-password-input"
+                          type="password"
+                          v-model="changePasswordForm.repeat_password"
+                          required
+                          placeholder="Repeat Password">
+            </b-form-input>
+        </b-form-group>
+        <b-button type="submit" variant="primary" class="mr-2">Submit</b-button>
+        <b-button type="reset" variant="danger">Reset</b-button>
+      </b-form>
+    </b-modal>
+
     <!-- delete registration modal -->
     <b-modal ref="deleteRegistrationModal"
              id="delete-registration-modal"
@@ -117,7 +168,7 @@
         <p class="my-4">{{warningMessage || 'Are you sure?'}}</p>
         <div slot="modal-footer" class="w-100">
           <b-form @submit="deleteRegistration" @reset="onResetDelete" class="w-100">
-            <b-button type="submit" variant="primary">Yes</b-button>
+            <b-button type="submit" variant="primary" class="mr-2">Yes</b-button>
             <b-button type="reset" variant="danger">No</b-button>
           </b-form>
         </div>
@@ -144,7 +195,7 @@
           <b-form-select v-model="roleSelected" :options="roles"></b-form-select>
         </b-form-group>
         <div slot="modal-footer" class="w-100">
-          <b-button type="submit" variant="primary">Update</b-button>
+          <b-button type="submit" variant="primary" class="mr-2">Update</b-button>
           <b-button type="reset" variant="danger">Reset</b-button>
         </div>
       </b-form>
@@ -156,11 +207,13 @@
 import AppHeader from './utils/AppHeader'
 import CourseSideBar from './inc/CourseSideBar'
 import CourseService from './service/CourseService'
+import Loader from '@/components/Loader'
 
 export default {
   name: 'CourseRegistrationList',
   data () {
     return {
+      isLoading: false,
       courseId: '',
       githubId: '',
       user_id: null,
@@ -178,6 +231,7 @@ export default {
         { key: 'user_name', sortable: true },
         { key: 'role', sortable: true },
         { key: 'acc_runtime', sortable: true },
+        { key: 'provider', sortable: true },
         { key: 'active', sortable: true },
         { key: 'actions', sortable: false }
       ],
@@ -186,6 +240,11 @@ export default {
       },
       updateRegistrationForm: {
         is_active: null
+      },
+      changePasswordForm: {
+        old_password: null,
+        new_password: null,
+        repeat_password: null
       },
       roles: [
         { value: 'lecturer', text: 'lecturer' },
@@ -207,16 +266,47 @@ export default {
       return this.$store.state.user
     }
   },
-  components: { CourseSideBar, AppHeader },
+  components: { CourseSideBar, AppHeader, Loader },
   methods: {
     loadMore () {
       this.isLoadMore = true
+    },
+    collapse () {
+      this.isLoadMore = false
     },
     expandFailed () {
       this.isExpandFailed = true
     },
     expandSuccess () {
       this.isExpandSuccess = true
+    },
+    closeAlertSuccess () {
+      this.registeredSuccess = []
+    },
+    closeAlertFailed () {
+      this.registeredFailed = []
+    },
+    changePassword (evt) {
+      evt.preventDefault()
+      this.$refs.changePasswordModal.hide()
+      const params = {
+        old_password: this.changePasswordForm.old_password,
+        new_password: this.changePasswordForm.new_password,
+        repeat_password: this.changePasswordForm.repeat_password
+      }
+      CourseService.updateRegistrationPassword(this.courseId, this.user_id, params, (response) => {
+        console.log('updateRegistrationPassword:', response)
+        if (response.data.payload.success === true) {
+          this.showAlert = true
+          this.alertMessage = 'Password successfully updated!'
+          this.loadRegistrations()
+          this.initForm()
+        } else {
+          console.error(response)
+        }
+      }, (error) => {
+        console.error(error)
+      })
     },
     handleRegistrationsList (registrations) {
       if (registrations.length <= 5) {
@@ -288,6 +378,10 @@ export default {
         console.error(error)
       })
     },
+    onResetUpdatePassword () {
+      this.user_id = null
+      this.$refs.changePasswordModal.hide()
+    },
     onResetUpdate () {
       this.user_id = null
       this.$refs.updateRegistrationModal.hide()
@@ -301,18 +395,20 @@ export default {
       })
     },
     handleFileUploadGithub () {
+      this.isLoading = true
       this.fileGithub = this.$refs.fileGithub.files[0]
       CourseService.registrationsFromCSV(this.courseId, this.fileGithub, (response) => {
-        console.log('handleFileUploadGithub response:', response)
+        this.isLoading = false
         this.registeredSuccess = response.data.payload.result.registered_success
         this.registeredFailed = response.data.payload.result.registered_failed
         this.loadRegistrations()
       })
     },
     handleFileUploadEmails () {
+      this.isLoading = true
       this.fileEmail = this.$refs.fileEmail.files[0]
       CourseService.emailsFromCSV(this.courseId, this.fileEmail, (response) => {
-        console.log('handleFileUploadEmails response:', response)
+        this.isLoading = false
         this.registeredSuccess = response.data.payload.result.registered_success
         this.registeredFailed = response.data.payload.result.registered_failed
         this.loadRegistrations()
@@ -320,6 +416,10 @@ export default {
     },
     initForm () {
       this.addRegistrationForm.githubId = ''
+      this.updateRegistrationForm.is_active = ''
+      this.changePasswordForm.old_password = ''
+      this.changePasswordForm.new_password = ''
+      this.changePasswordForm.repeat_password = ''
     },
     onReset (evt) {
       evt.preventDefault()
