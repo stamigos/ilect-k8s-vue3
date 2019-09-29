@@ -6,11 +6,17 @@
       <div class="col-sm-8 pt-5">
         <div class="container">
           <div>
-            <p class="text-secondary header" v-if="assignment_name">Assignment name</p>
-            <p v-if="assignment_name">{{assignment_name}}</p>
-            <div class="pt-3">
+            <b-row class="col-sm-7">
+              <b-col>
+                <p class="text-secondary header" v-if="assignment_name">Assignment name</p>
+                <p v-if="assignment_name">{{assignment_name}}</p>
+              </b-col>
+              <b-col>
+                <b-button type="button" variant="outline-info" @click="downloadCSV">Download CSV</b-button>
+              </b-col>
+            </b-row>
+            <div class="pt-3 table-responsive">
               <b-table
-                class="table-responsive"
                 :items="submissions"
                 :fields="fields"
                 :sort-by.sync="sortBy"
@@ -86,6 +92,9 @@ export default {
       }, (error) => {
         console.error(error)
       })
+    },
+    downloadCSV () {
+      ScoreService.downloadCSV(this.courseId, this.assignmentId)
     }
   },
   created () {

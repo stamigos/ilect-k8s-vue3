@@ -9,21 +9,27 @@
           <p v-if="assignments[0]">{{course_name}}</p>
           <button class="btn btn-outline-info mt-3" v-b-modal.assignment-modal>Create Assignment</button>
           <div class="col-sm-12 pt-4">
-            <b-table
-              class="table-responsive"
-              :items="assignments"
-              :fields="fields"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              @row-clicked="rowClicked"
-            >
-              <template slot="leader_board" slot-scope="leader_board">
-                <div @click="toggleDisplayLeaderboard($event, leader_board.item)">
-                  <i class="fa fa-eye" v-if="leader_board.item.show_lb === true" aria-hidden="true"></i>
-                  <i class="fa fa-eye-slash" v-else="" aria-hidden="true"></i>
-                </div>
-              </template>
-            </b-table>
+            <div class="table-responsive">
+              <b-table
+                :items="assignments"
+                :fields="fields"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                @row-clicked="rowClicked"
+              >
+                <template slot="leader_board" slot-scope="leader_board">
+                  <div @click="toggleDisplayLeaderboard($event, leader_board.item)">
+                    <i class="fa fa-eye" v-if="leader_board.item.show_lb === true" aria-hidden="true"></i>
+                    <i class="fa fa-eye-slash" v-else="" aria-hidden="true"></i>
+                  </div>
+                </template>
+                <template slot="actions" slot-scope="data">
+                    <a class="mr-2" @click="selectAssignment($event, data.item)" v-b-modal.update-assignment-modal>
+                      <i class="fas fa-edit text-primary"></i>
+                    </a>
+                </template>
+              </b-table>
+            </div>
           </div>
         </div>
       </div>
@@ -32,6 +38,8 @@
     <b-modal ref="addAssignmentModal"
              id="assignment-modal"
              title="Add a new assignment"
+             @show="initForm"
+             @hidden="initForm"
              hide-footer>
       <b-form @submit="createAssignment" @reset="onReset" class="w-100">
         <b-form-group id="form-name-group"
@@ -73,7 +81,57 @@
                           placeholder="Enter command">
             </b-form-input>
         </b-form-group>
-        <b-button type="submit" variant="primary">Submit</b-button>
+        <b-button type="submit" class="mr-3" variant="primary">Submit</b-button>
+        <b-button type="reset" variant="danger">Reset</b-button>
+      </b-form>
+    </b-modal>
+
+    <!-- update course modal -->
+    <b-modal ref="updateAssignmentModal"
+             id="update-assignment-modal"
+             title="Update assignment"
+             hide-footer>
+      <b-form @submit="updateAssignment" @reset="onResetUpdateAssignment" class="w-100">
+        <b-form-group id="form-name-group"
+                      label="Assignment name:"
+                      label-for="form-name-input">
+            <b-form-input id="form-name-input"
+                          type="text"
+                          v-model="form.name"
+                          required
+                          placeholder="Enter assignment name">
+            </b-form-input>
+        </b-form-group>
+        <b-form-group id="form-description-group"
+                  label="Description:"
+                  label-for="form-description-input">
+        <b-form-textarea id="form-description-input"
+                         v-model="form.description"
+                         placeholder="Enter description..."
+                         rows="3"
+                         max-rows="6"
+                         required
+        ></b-form-textarea>
+        </b-form-group>
+        <b-form-group id="form-deadline-group"
+                      label="Deadline:"
+                      label-for="form-deadline-input">
+            <flat-pickr id="form-deadline-input"
+                        class="form-control"
+                        placeholder="Select deadline"
+                        v-model="form.deadline">
+            </flat-pickr>
+        </b-form-group>
+        <b-form-group id="form-command-group"
+                      label="Command:"
+                      label-for="form-command-input">
+            <b-form-input id="form-command-input"
+                          type="text"
+                          v-model="form.command"
+                          placeholder="Enter command">
+            </b-form-input>
+        </b-form-group>
+        <b-button type="submit" class="mr-3" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
     </b-modal>
@@ -103,7 +161,8 @@ export default {
         { key: 'description', sortable: true },
         { key: 'command', sortable: true },
         { key: 'deadline', sortable: true },
-        { key: 'leader_board', sortable: true }
+        { key: 'leader_board', sortable: true },
+        { key: 'actions', sortable: false }
       ],
       assignments: [],
       form: {
@@ -156,6 +215,31 @@ export default {
         console.error(error)
       })
     },
+    updateAssignment (evt) {
+      evt.preventDefault()
+      this.$refs.updateAssignmentModal.hide()
+      const params = {
+        name: this.form.name,
+        deadline: this.form.deadline,
+        command: this.form.command,
+        description: this.form.description
+      }
+      CourseService.updateAssignment(this.courseId, this.assignmentId, params, (response) => {
+        console.log(response)
+        this.showAlert = true
+        this.alertMessage = 'Assignment successfully updated!'
+        this.loadAssignments()
+      }, (error) => {
+        console.error(error)
+      })
+    },
+    selectAssignment (evt, assignment) {
+      this.assignmentId = assignment.id
+      this.form.deadline = assignment.deadline
+      this.form.command = assignment.command
+      this.form.name = assignment.name
+      this.form.description = assignment.description
+    },
     loadAssignments () {
       CourseService.findAssignments(this.courseId, (response) => {
         console.log(response)
@@ -168,12 +252,19 @@ export default {
     initForm () {
       this.form.name = ''
       this.form.description = ''
+      this.form.deadline = ''
+      this.form.command = ''
       this.form.start = ''
       this.form.end = ''
     },
     onReset (evt) {
       evt.preventDefault()
       this.$refs.addAssignmentModal.hide()
+      this.initForm()
+    },
+    onResetUpdateAssignment (evt) {
+      evt.preventDefault()
+      this.$refs.updateAssignmentModal.hide()
       this.initForm()
     }
   },

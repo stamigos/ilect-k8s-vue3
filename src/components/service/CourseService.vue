@@ -84,6 +84,14 @@ export default {
       errorHandler(error)
     })
   },
+  updateAssignment: function (courseId, assignmentId, params, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/assignments/${assignmentId}`
+    ApiClient.update(targetPath, params, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
   updateRegistrationPassword: function (courseId, userId, params, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/registrations/${userId}/change-password`
     ApiClient.update(targetPath, params, (response) => {

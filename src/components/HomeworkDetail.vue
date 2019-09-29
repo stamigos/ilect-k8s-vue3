@@ -8,7 +8,8 @@
           <p class="text-secondary header">Assignment name</p>
           <p>{{assignment_name}}</p>
           <p class="text-secondary header">Student name</p>
-          <p>{{submission.user_name}}</p>
+          <p v-if="submission.user_name">{{submission.user_name}}</p>
+          <p v-else="">{{$user.get()['username']}}</p>
           <p class="text-secondary header">Score</p>
           <p>{{submission.score}}</p>
           <p class="text-secondary header">Scored output logs</p>
@@ -45,12 +46,14 @@ export default {
     loadSubmission () {
       CourseService.findSubmission(this.courseId, this.assignmentId, (response) => {
         console.log(response)
-        this.content = response.data.payload.submission.content
-        this.submission.user_id = response.data.payload.submission.user_id
-        this.submission.user_name = response.data.payload.submission.username
-        this.submission.score = response.data.payload.submission.score
-        this.submission.output = response.data.payload.submission.output
         this.assignment_name = response.data.payload.assignment_name
+        if (response.data.payload.submission) {
+          this.content = response.data.payload.submission.content
+          this.submission.user_id = response.data.payload.submission.user_id
+          this.submission.user_name = response.data.payload.submission.username
+          this.submission.score = response.data.payload.submission.score
+          this.submission.output = response.data.payload.submission.output
+        }
       }, (error) => {
         console.error(error)
       })

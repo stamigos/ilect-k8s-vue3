@@ -37,6 +37,11 @@ export default {
     }, (error) => {
       errorHandler(error)
     })
+  },
+  downloadCSV: function (courseId, assignmentId) {
+    const baseApi = process.env.VUE_APP_API_BASE_URL
+    const targetPath = `${baseApi}/courses/${courseId}/score/assignments/${assignmentId}/submissions/download-csv`
+    window.open(targetPath)
   }
 }
 </script>

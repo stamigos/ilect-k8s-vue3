@@ -19,7 +19,7 @@
 
               </template>
               <template slot="actions" slot-scope="actions">
-                  <a @click="goToLeaderBoard($event, actions.item)" class="text-info">
+                  <a @click="goToLeaderBoard($event, actions.item)" v-if="actions.item.show_lb === true" class="text-info">
                     Go to Leaderboard
                   </a>
               </template>

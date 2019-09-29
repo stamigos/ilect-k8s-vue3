@@ -58,34 +58,34 @@
                 </b-col>
             </b-row>
           </b-form>
-          <div class="col-sm-10 pt-5">
+          <div class="col-sm-12 pt-5">
             <div class="alert alert-dismissible alert-success" v-show="showAlert">
               <button type="button" class="close" data-dismiss="alert">&times;</button>
               <strong>{{alertMessage}}</strong>
             </div>
+            <div class="table-responsive">
+              <b-table
+                :items="handleRegistrationsList(filteredList)"
+                :fields="fields"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+              >
+                <template slot="HEAD_actions" slot-scope="actions">
 
-            <b-table
-              class="table-responsive"
-              :items="handleRegistrationsList(filteredList)"
-              :fields="fields"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-            >
-              <template slot="HEAD_actions" slot-scope="actions">
-
-              </template>
-              <template slot="actions" slot-scope="data">
-                  <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.update-registration-modal>
-                    <i class="fas fa-edit text-primary"></i>
-                  </a>
-                  <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.delete-registration-modal>
-                    <i class="fas fa-trash-alt text-danger"></i>
-                  </a>
-                  <a class="mr-2" v-if="data.item.provider === 'Email'" @click="selectRegistration($event, data.item)" v-b-modal.change-password-modal>
-                    <i class="fas fa-lock text-secondary"></i>
-                  </a>
-              </template>
-            </b-table>
+                </template>
+                <template slot="actions" slot-scope="data">
+                    <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.update-registration-modal>
+                      <i class="fas fa-edit text-primary"></i>
+                    </a>
+                    <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.delete-registration-modal>
+                      <i class="fas fa-trash-alt text-danger"></i>
+                    </a>
+                    <a class="mr-2" v-if="data.item.provider === 'Email'" @click="selectRegistration($event, data.item)" v-b-modal.change-password-modal>
+                      <i class="fas fa-lock text-secondary"></i>
+                    </a>
+                </template>
+              </b-table>
+            </div>
             <div class="text-center" v-if="!isLoadMore && filteredList.length > 5">
               <hr>
               <b-button variant="btn btn-info" @click="loadMore">Load more (Total: {{filteredList.length}})</b-button>
@@ -341,6 +341,7 @@ export default {
       this.user_id = registration.user_id
       this.status = registration.status
       this.roleSelected = registration.role
+      console.log('registration:', registration)
       if (registration.status === 1) {
         this.warningMessage = 'Containter is running. Are you sure?'
       }

@@ -64,8 +64,14 @@
           </b-row>
           <b-row class="col-sm-7" v-if="Object.keys(routes).length > 0 && podStatus === 'Running'">
             <b-col>
-                <button class="btn btn-primary"><a :href="`https://${routes['notebook']}`" target="_blank" referrerpolicy="unsafe-url">Open NoteBook</a></button>
-                <button class="btn btn-primary"><a :href="`https://${routes['vnc']}`" target="_blank" referrerpolicy="unsafe-url">Open VNC</a></button>
+                <button class="btn btn-info mr-3">
+                  <a v-if="!isNotebookLoading" class="jupyter-link" :href="`https://${routes['notebook']}`" target="_blank" referrerpolicy="unsafe-url">Open NoteBook</a>
+                  <b-spinner v-if="isNotebookLoading" variant="primary" label="Spinning"></b-spinner>
+                </button>
+                <button class="btn btn-info">
+                  <a v-if="!isNotebookLoading" class="jupyter-link" :href="`https://${routes['vnc']}`" target="_blank" referrerpolicy="unsafe-url">Open VNC</a>
+                  <b-spinner v-if="isNotebookLoading" variant="primary" label="Spinning"></b-spinner>
+                </button>
             </b-col>
           </b-row>
           <hr v-if="Object.keys(routes).length > 0 && podStatus === 'Running'">
@@ -111,7 +117,8 @@ export default {
         { value: 0, text: 'CPU' },
         { value: 1, text: 'GPU' }
       ],
-      instanceType: 0
+      instanceType: 0,
+      isNotebookLoading: false
     }
   },
   mounted () {
@@ -126,7 +133,12 @@ export default {
       PodService.startPod(this.courseId, params, (response) => {
         console.log(response)
         PodService.findRoutes(this.courseId, (routeRes) => {
-          this.routes = routeRes.data
+          var self = this
+          self.routes = routeRes.data
+          self.isNotebookLoading = true
+          setTimeout(() => {
+            self.isNotebookLoading = false
+          }, 30000)
         })
         var self = this
         var timerId = setTimeout(() => {
@@ -215,4 +227,7 @@ export default {
 </script>
 
 <style scoped>
+.jupyter-link {
+  color: #fff;
+}
 </style>
