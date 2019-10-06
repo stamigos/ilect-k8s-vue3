@@ -127,7 +127,9 @@ export default {
   },
   methods: {
     startPod () {
+      console.log('this.instanceType:', this.instanceType)
       const isGpu = (this.instanceType === 1) ? true : false
+      console.log('isGpu:', isGpu)
       let params = {user: this.userName, is_gpu: isGpu}
       this.isLoadingStart = true
       PodService.startPod(this.courseId, params, (response) => {
@@ -217,7 +219,6 @@ export default {
     this.courseId = this.$route.params.courseId
     console.log(this.courseId)
     PodService.findStatus(this.courseId, (podRes) => {
-      console.log('podRes:', podRes)
       this.podStatus = podRes.data.pod_status
     }, (error) => {
       console.error(error)

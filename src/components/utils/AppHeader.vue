@@ -8,6 +8,15 @@
       <b-navbar-nav>
         <b-nav-item href="/courses">Courses</b-nav-item>
         <b-nav-item href="#" disabled>Info</b-nav-item>
+        <b-nav-item href="#" disabled>
+          <div class="alert alert-dismissible alert-danger" v-show="connectionLost">
+            <strong>Connection lost.</strong>
+          </div>
+        </b-nav-item>
+<!--           <div class="alert alert-dismissible alert-success" v-show="!connectionLost">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Connection renewed.</strong>
+          </div> -->
       </b-navbar-nav>
 
       <!-- Right aligned nav items -->
@@ -25,6 +34,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 import ApiClient from '../utils/ApiClient'
 import AuthService from '../service/AuthService'
 import PodService from '../service/PodService'
@@ -37,7 +48,8 @@ export default {
       routes: {},
       // routes: {'notebook': '', 'vnc': ''}
       podStatus: 'None',
-      userName: 'irration'
+      userName: 'irration',
+      connectionLost: false
     }
   },
   methods: {
@@ -86,9 +98,37 @@ export default {
       }, (error) => {
         console.log('error:', error)
       })
+    },
+    async subscribe () {
+      console.log('connection check')
+      const targetPath = `${process.env.VUE_APP_API_BASE_URL}/health`
+      try {
+        var response = await axios.get(targetPath)
+      } catch (error) {
+        this.connectionLost = true
+        // Reconnect in 3 seconds
+        await new Promise(resolve => setTimeout(resolve, 6000))
+        // Call subscribe() again to get the next message
+        await this.subscribe()
+      }
+
+      if (response.status === 502) {
+        await new Promise(resolve => setTimeout(resolve, 6000))
+        await this.subscribe()
+      } else if (response.status !== 200) {
+        this.connectionLost = true
+        await new Promise(resolve => setTimeout(resolve, 6000))
+        await this.subscribe()
+      } else {
+        // let message = await response.text()
+        this.connectionLost = false
+        await new Promise(resolve => setTimeout(resolve, 6000))
+        await this.subscribe()
+      }
     }
   },
   created () {
+    this.subscribe()
     const token = this.$store.state.authHeader
     AuthService.updateToken(token)
     AuthService.authCheck((response) => {
@@ -120,7 +160,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
   .app-header {
     position: fixed;
     margin: 0;
@@ -131,5 +171,9 @@ export default {
   }
   .navbar {
     min-height: 8vh;
+  }
+  .alert {
+    padding: 0px 15px;
+    margin: 0;
   }
 </style>
