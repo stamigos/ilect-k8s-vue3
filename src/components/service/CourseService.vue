@@ -118,14 +118,6 @@ export default {
       errorHandler(error)
     })
   },
-  updateAssignment: function (courseId, assignmentId, params, callback, errorHandler) {
-    const targetPath = `/courses/${courseId}/assignments/${assignmentId}`
-    ApiClient.update(targetPath, params, (response) => {
-      callback(response)
-    }, (error) => {
-      errorHandler(error)
-    })
-  },
   extendDeadline: function (courseId, params, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/deadline`
     ApiClient.update(targetPath, params, (response) => {
