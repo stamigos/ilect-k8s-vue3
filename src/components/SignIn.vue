@@ -44,7 +44,7 @@ export default {
         email: '',
         password: ''
       },
-      loginError: null,
+      loginError: null
     }
   },
   methods: {

@@ -118,14 +118,6 @@ export default {
       errorHandler(error)
     })
   },
-  updateAssignment: function (courseId, assignmentId, params, callback, errorHandler) {
-    const targetPath = `/courses/${courseId}/assignments/${assignmentId}`
-    ApiClient.update(targetPath, params, (response) => {
-      callback(response)
-    }, (error) => {
-      errorHandler(error)
-    })
-  },
   extendDeadline: function (courseId, params, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/deadline`
     ApiClient.update(targetPath, params, (response) => {
@@ -165,6 +157,15 @@ export default {
     }, (error) => {
       errorHandler(error)
     })
+  },
+  downloadCSV: function (courseId, assignmentId, callback, errorHandler) {
+    const targetPath = `${process.env.VUE_APP_API_BASE_URL}/courses/${courseId}/assignments/${assignmentId}/submissions/download-csv`
+    window.open(targetPath)
+    // ApiClient.downloadCSV(targetPath, params, (response) => {
+    //   callback(response)
+    // }, (error) => {
+    //   errorHandler(error)
+    // })
   }
 }
 </script>

@@ -124,13 +124,19 @@ export default {
   mounted () {
     this.getResttime()
     this.getStatus()
+    PodService.findRoutes(this.courseId, (routeRes) => {
+      var self = this
+      self.routes = routeRes.data
+      self.isNotebookLoading = true
+      self.isNotebookLoading = false
+    })
   },
   methods: {
     startPod () {
       console.log('this.instanceType:', this.instanceType)
-      const isGpu = (this.instanceType === 1) ? true : false
+      const isGpu = (this.instanceType === 1)
       console.log('isGpu:', isGpu)
-      let params = {user: this.userName, is_gpu: isGpu}
+      const params = { user: this.userName, is_gpu: isGpu }
       this.isLoadingStart = true
       PodService.startPod(this.courseId, params, (response) => {
         console.log(response)
@@ -201,6 +207,15 @@ export default {
         console.error(error)
       })
     },
+    getCourse () {
+      CourseService.getCourse(this.courseId, (response) => {
+        console.log('getCourse:', response)
+        this.course = response.data
+        this.instanceType = response.data.container.gpu
+      }, (error) => {
+        console.error(error)
+      })
+    },
     extend (evt) {
       evt.preventDefault()
       const params = {
@@ -217,6 +232,7 @@ export default {
   },
   created () {
     this.courseId = this.$route.params.courseId
+    this.getCourse()
     console.log(this.courseId)
     PodService.findStatus(this.courseId, (podRes) => {
       this.podStatus = podRes.data.pod_status

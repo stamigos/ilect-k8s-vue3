@@ -18,10 +18,16 @@
                 @row-clicked="rowClicked"
               >
                 <template slot="HEAD_cron" slot-scope="HEAD_cron">
-                  Cron <span style="font-size: 12px">* * * * *</span>
+                  Cron
+                </template>
+                <template slot="deadline" slot-scope="deadline">
+                  {{formatDate(deadline.item.deadline)}}
                 </template>
                 <template slot="cron" slot-scope="cron">
                   {{cron.item.cron.minutes}} {{cron.item.cron.hours}} {{cron.item.cron.day}} {{cron.item.cron.month}} {{cron.item.cron.day_of_the_week}}
+                </template>
+                <template slot="HEAD_assignment_type" slot-scope="HEAD_assignment_type">
+                  Type
                 </template>
                 <template slot="leader_board" slot-scope="leader_board">
                   <div @click="toggleDisplayLeaderboard($event, leader_board.item)">
@@ -87,6 +93,11 @@
                           placeholder="Enter command">
             </b-form-input>
         </b-form-group>
+        <b-form-group id="form-assignment-type-group"
+                      label="Assignment Type:"
+                      label-for="form-assignment-type-select">
+          <b-form-select id="form-assignment-type-select" v-model="form.assignment_type" :options="assignmentTypeOptions"></b-form-select>
+        </b-form-group>
         <b-form-group id="form-cron-setting-group"
                       label="Cron setting (Optional - minutes, hours, day, month, day of the week):"
                       label-for="form-cron-setting-input">
@@ -94,35 +105,35 @@
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.minutes"
+                              v-model="cron.minutes"
                               placeholder="*">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.hours"
+                              v-model="cron.hours"
                               placeholder="*">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.day"
+                              v-model="cron.day"
                               placeholder="*">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.month"
+                              v-model="cron.month"
                               placeholder="*">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.day_of_the_week"
+                              v-model="cron.day_of_the_week"
                               placeholder="*">
                 </b-form-input>
               </b-col>
@@ -178,6 +189,11 @@
                           placeholder="Enter command">
             </b-form-input>
         </b-form-group>
+        <b-form-group id="form-assignment-type-group"
+                      label="Assignment Type:"
+                      label-for="form-assignment-type-select">
+          <b-form-select id="form-assignment-type-select" v-model="form.assignment_type" :options="assignmentTypeOptions"></b-form-select>
+        </b-form-group>
         <b-form-group id="form-cron-setting-group"
                       label="Cron setting (minutes, hours, day, month, day of the week):"
                       label-for="form-cron-setting-input">
@@ -185,35 +201,35 @@
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.minutes"
+                              v-model="cron.minutes"
                               placeholder="*">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.hours"
+                              v-model="cron.hours"
                               placeholder="*">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.day"
+                              v-model="cron.day"
                               placeholder="*">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.month"
+                              v-model="cron.month"
                               placeholder="*">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="form.cron.day_of_the_week"
+                              v-model="cron.day_of_the_week"
                               placeholder="*">
                 </b-form-input>
               </b-col>
@@ -247,6 +263,7 @@ export default {
         { key: 'id', sortable: true },
         { key: 'name', sortable: true },
         { key: 'description', sortable: true },
+        { key: 'assignment_type', sortable: true },
         { key: 'command', sortable: true },
         { key: 'deadline', sortable: true },
         { key: 'cron', sortable: true },
@@ -258,17 +275,22 @@ export default {
         name: '',
         description: '',
         command: '',
-        deadline: '',
-        cron: {
-          minutes: '',
-          hours: '',
-          day: '',
-          month: '',
-          day_of_the_week: ''
-        }
+        assignment_type: 0,
+        deadline: ''
+      },
+      cron: {
+        minutes: '',
+        hours: '',
+        day: '',
+        month: '',
+        day_of_the_week: ''
       },
       courseId: '',
-      courseName: ''
+      courseName: '',
+      assignmentTypeOptions: [
+        { value: 0, text: 'Python' },
+        { value: 1, text: 'CSV' }
+      ]
     }
   },
   methods: {
@@ -301,13 +323,19 @@ export default {
       evt.preventDefault()
       this.$refs.addAssignmentModal.hide()
       console.log(this.form)
-      const cron = this.form.cron
+      const cron = this.cron
+      var _cronString = ''
+      if (cron.minutes !== '' && cron.hours !== '' && cron.day !== '' &&
+          cron.month !== '' && cron.day_of_the_week !== '') {
+        _cronString = `${cron.minutes} ${cron.hours} ${cron.day} ${cron.month} ${cron.day_of_the_week}` // * * * * *
+      }
       const params = {
         name: this.form.name,
         deadline: this.form.deadline,
         command: this.form.command,
         description: this.form.description,
-        cron: `${cron.minutes} ${cron.hours} ${cron.day} ${cron.month} ${cron.day_of_the_week}` // * * * * *
+        assignment_type: this.form.assignment_type === 0 ? 'Python' : 'CSV',
+        cron: _cronString
       }
       CourseService.createAssignment(this.courseId, params, (response) => {
         console.log(response)
@@ -321,13 +349,19 @@ export default {
     updateAssignment (evt) {
       evt.preventDefault()
       this.$refs.updateAssignmentModal.hide()
-      const cron = this.form.cron
+      const cron = this.cron
+      var _cronString = ''
+      if (cron.minutes !== '' && cron.hours !== '' && cron.day !== '' &&
+          cron.month !== '' && cron.day_of_the_week !== '') {
+        _cronString = `${cron.minutes} ${cron.hours} ${cron.day} ${cron.month} ${cron.day_of_the_week}` // * * * * *
+      }
       const params = {
         name: this.form.name,
         deadline: this.form.deadline,
         command: this.form.command,
         description: this.form.description,
-        cron: `${cron.minutes} ${cron.hours} ${cron.day} ${cron.month} ${cron.day_of_the_week}` // * * * * *
+        assignment_type: this.form.assignment_type === 0 ? 'Python' : 'CSV',
+        cron: _cronString
       }
       CourseService.updateAssignment(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
@@ -345,6 +379,7 @@ export default {
       this.form.name = assignment.name
       this.form.description = assignment.description
       this.form.cron = assignment.cron
+      this.form.assignment_type = assignment.assignment_type === 'Python' ? 0 : 1
     },
     loadAssignments () {
       CourseService.findAssignments(this.courseId, (response) => {
@@ -369,6 +404,23 @@ export default {
         month: '',
         day_of_the_week: ''
       }
+      this.form.assignment_type = 0
+    },
+    formatDate (dateString) {
+      var dateObj = new Date(dateString)
+      console.log('dateObj:', dateObj)
+      var date = dateObj.getDate()
+      var month = dateObj.getMonth()
+      var year = dateObj.getFullYear()
+      var hours = dateObj.getHours()
+      var minutes = dateObj.getMinutes()
+      if (hours < 10) {
+        hours = `0${hours}`
+      }
+      if (minutes < 10) {
+        minutes = `0${minutes}`
+      }
+      return `${date}/${month}/${year}`
     },
     onReset (evt) {
       evt.preventDefault()

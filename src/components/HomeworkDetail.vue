@@ -18,7 +18,10 @@
           <div class="editor-submission">
             <editor id="editor" v-model="content" minLines="5" maxLines="10" showGutter="true" showLineNumbers="false" @init="editorInit" lang="python" theme="dracula" width="750px" height="300px"></editor>
           </div>
-          <button class="btn btn-info button-submission" v-on:click="addSubmission">Save</button>
+          <div class="mb-3">
+            <b-button variant="info" class="mr-3" v-on:click="addSubmission">Save</b-button>
+            <b-button variant="info" v-if="assignment_type === 'CSV'" @click="downloadCSV">Download CSV</b-button>
+          </div>
         </div>
       </div>
     </div>
@@ -39,7 +42,8 @@ export default {
       assignmentId: '',
       content: '',
       submission: {},
-      assignment_name: null
+      assignment_name: null,
+      assignment_type: null
     }
   },
   methods: {
@@ -47,6 +51,7 @@ export default {
       CourseService.findSubmission(this.courseId, this.assignmentId, (response) => {
         console.log(response)
         this.assignment_name = response.data.payload.assignment_name
+        this.assignment_type = response.data.payload.assignment_type
         if (response.data.payload.submission) {
           this.content = response.data.payload.submission.content
           this.submission.user_id = response.data.payload.submission.user_id
@@ -105,6 +110,9 @@ export default {
       }, (error) => {
         console.error(error)
       })
+    },
+    downloadCSV () {
+      CourseService.downloadCSV(this.courseId, this.assignmentId)
     }
   },
   created () {
@@ -125,6 +133,7 @@ export default {
   .editor-submission {
     position: relative;
     top: 2vh;
+    margin-bottom: 20px;
   }
   .button-submission {
     position: relative;

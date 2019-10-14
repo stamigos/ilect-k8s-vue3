@@ -230,7 +230,8 @@ export default {
         { key: 'id', sortable: true },
         { key: 'user_name', sortable: true },
         { key: 'role', sortable: true },
-        { key: 'acc_runtime', sortable: true },
+        { key: 'acc_runtime_cpu', sortable: true },
+        { key: 'acc_runtime_gpu', sortable: true },
         { key: 'provider', sortable: true },
         { key: 'active', sortable: true },
         { key: 'actions', sortable: false }
