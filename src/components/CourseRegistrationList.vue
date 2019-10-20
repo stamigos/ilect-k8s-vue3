@@ -4,7 +4,7 @@
     <app-header></app-header>
     <div class="row w-100">
       <course-side-bar :course-id="courseId"></course-side-bar>
-      <div class="col-sm-9 pt-5">
+      <div class="col-sm-10 pt-5">
           <div class="alert alert-dismissible alert-success" v-show="registeredSuccess.length > 0">
             <button type="button" class="close" @click="closeAlertSuccess()">&times;</button>
             <h4>Success: {{registeredSuccess.length}}</h4>
@@ -70,10 +70,31 @@
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
               >
+                <template slot="HEAD_type" slot-scope="data">
+                  CPU/GPU
+                </template>
+                <template slot="type" slot-scope="data">
+                  <span v-if="data.item.desired_status === 'Running' && data.item.type == 0">CPU</span>
+                  <span v-if="data.item.desired_status === 'Running' && data.item.type == 1">GPU</span>
+                </template>
+                <template slot="HEAD_pod" slot-scope="pod">
+
+                </template>
+                <template slot="pod" slot-scope="data">
+                  <span style="white-space: nowrap;" v-if="data.item.desired_status === 'Running'">
+                    <a class="mr-2" :id="`stop-pod-${data.item.user_id}`" @click="stopPod($event, data.item)">
+                      <i class="fas fa-stop text-danger"></i>
+                    </a>
+                    <b-tooltip :target="`stop-pod-${data.item.user_id}`" triggers="hover">
+                      Stop pod for user {{ data.item.user_name }}
+                    </b-tooltip>
+                  </span>
+                </template>
                 <template slot="HEAD_actions" slot-scope="actions">
 
                 </template>
                 <template slot="actions" slot-scope="data">
+                  <span style="white-space: nowrap;">
                     <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.update-registration-modal>
                       <i class="fas fa-edit text-primary"></i>
                     </a>
@@ -83,6 +104,7 @@
                     <a class="mr-2" v-if="data.item.provider === 'Email'" @click="selectRegistration($event, data.item)" v-b-modal.change-password-modal>
                       <i class="fas fa-lock text-secondary"></i>
                     </a>
+                  </span>
                 </template>
               </b-table>
             </div>
@@ -126,16 +148,6 @@
              title="Change password"
              hide-footer>
       <b-form @submit="changePassword" @reset="onResetUpdatePassword" class="w-100">
-        <b-form-group id="form-old-password-group"
-                      label="Old Password:"
-                      label-for="form-old-password-input">
-            <b-form-input id="form-old-password-input"
-                          type="password"
-                          v-model="changePasswordForm.old_password"
-                          required
-                          placeholder="Old Password">
-            </b-form-input>
-        </b-form-group>
         <b-form-group id="form-name-group"
                       label="New Password:"
                       label-for="form-name-input">
@@ -207,6 +219,7 @@
 import AppHeader from './utils/AppHeader'
 import CourseSideBar from './inc/CourseSideBar'
 import CourseService from './service/CourseService'
+import PodService from './service/PodService'
 import Loader from '@/components/Loader'
 
 export default {
@@ -232,8 +245,11 @@ export default {
         { key: 'role', sortable: true },
         { key: 'acc_runtime_cpu', sortable: true },
         { key: 'acc_runtime_gpu', sortable: true },
+        { key: 'desired_status', sortable: true },
+        { key: 'type', sortable: true },
         { key: 'provider', sortable: true },
         { key: 'active', sortable: true },
+        { key: 'pod', sortable: false },
         { key: 'actions', sortable: false }
       ],
       addRegistrationForm: {
@@ -243,7 +259,6 @@ export default {
         is_active: null
       },
       changePasswordForm: {
-        old_password: null,
         new_password: null,
         repeat_password: null
       },
@@ -291,7 +306,6 @@ export default {
       evt.preventDefault()
       this.$refs.changePasswordModal.hide()
       const params = {
-        old_password: this.changePasswordForm.old_password,
         new_password: this.changePasswordForm.new_password,
         repeat_password: this.changePasswordForm.repeat_password
       }
@@ -427,6 +441,25 @@ export default {
       evt.preventDefault()
       this.$refs.addRegistrationModal.hide()
       this.initForm()
+    },
+    stopPod (evt, item) {
+      const isGpu = (item.type === 1)
+      console.log('item:', item)
+      const params = { user: this.userName, user_id: item.user_id }
+      PodService.stopPod(this.courseId, params, (response) => {
+        console.log(response)
+        // PodService.findRoutes(this.courseId, (routeRes) => {
+        //   this.routes = routeRes.data
+        // })
+        // PodService.findStatus(this.courseId, (podRes) => {
+        //   console.log(podRes)
+        //   this.podStatus = podRes.data.pod_status
+        // }, (error) => {
+        //   console.error(error)
+        // })
+      }, (error) => {
+        console.error(error)
+      })
     }
   },
   created () {

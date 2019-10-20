@@ -52,6 +52,14 @@ export default {
       connectionLost: false
     }
   },
+  sockets: {
+    connect () {
+      this.connectionLost = false
+    },
+    connect_error () {
+      this.connectionLost = true
+    }
+  },
   methods: {
     signOut () {
       console.log('signOut')
@@ -83,7 +91,6 @@ export default {
       })
     },
     stopPod () {
-      alert('start pods!')
       const params = { user: this.userName }
       this.isNavHide = false
       PodService.stopPod(this.courseId, params, (response) => {
@@ -128,7 +135,10 @@ export default {
     }
   },
   created () {
-    this.subscribe()
+    if (!window.WebSocket) {
+      // if browser does not support websockets
+      this.subscribe()
+    }
     const token = this.$store.state.authHeader
     AuthService.updateToken(token)
     AuthService.authCheck((response) => {

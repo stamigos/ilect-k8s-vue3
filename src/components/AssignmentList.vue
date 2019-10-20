@@ -77,12 +77,16 @@
         </b-form-group>
         <b-form-group id="form-deadline-group"
                       label="Deadline:"
-                      label-for="form-deadline-input">
+                      label-for="form-deadline-input"
+                      style="position: relative;margin-bottom: 50px;">
             <flat-pickr id="form-deadline-input"
                         class="form-control"
                         placeholder="Select deadline"
-                        v-model="form.deadline">
+                        v-model="form.deadline"
+                        style="position: absolute; top:40px; left:0;z-index: 2">
             </flat-pickr>
+            <b-form-input style="position: absolute; top:40px; left:0;z-index: 1" type="text" name="deadline" v-model="form.deadline" required>
+            </b-form-input>
         </b-form-group>
         <b-form-group id="form-command-group"
                       label="Command:"
@@ -173,12 +177,16 @@
         </b-form-group>
         <b-form-group id="form-deadline-group"
                       label="Deadline:"
-                      label-for="form-deadline-input">
+                      label-for="form-deadline-input"
+                      style="position: relative;margin-bottom: 50px;">
             <flat-pickr id="form-deadline-input"
                         class="form-control"
                         placeholder="Select deadline"
-                        v-model="form.deadline">
+                        v-model="form.deadline"
+                        style="position: absolute; top:40px; left:0;z-index: 2">
             </flat-pickr>
+            <b-form-input style="position: absolute; top:40px; left:0;z-index: 1" type="text" name="deadline" v-model="form.deadline" required>
+            </b-form-input>
         </b-form-group>
         <b-form-group id="form-command-group"
                       label="Command:"
@@ -408,7 +416,6 @@ export default {
     },
     formatDate (dateString) {
       var dateObj = new Date(dateString)
-      console.log('dateObj:', dateObj)
       var date = dateObj.getDate()
       var month = dateObj.getMonth()
       var year = dateObj.getFullYear()

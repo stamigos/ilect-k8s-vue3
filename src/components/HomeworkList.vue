@@ -15,6 +15,9 @@
               :sort-desc.sync="sortDesc"
               @row-clicked="rowClicked"
             >
+              <template slot="deadline" slot-scope="deadline">
+                  {{ formatDate(deadline.item.deadline) }}
+              </template>
               <template slot="HEAD_actions" slot-scope="actions">
 
               </template>
@@ -48,6 +51,7 @@ export default {
         { key: 'id', sortable: true },
         { key: 'name', sortable: true },
         { key: 'description', sortable: true },
+        { key: 'assignment_type', sortable: true },
         { key: 'command', sortable: true },
         { key: 'deadline', sortable: true },
         { key: 'submission_status', sortable: true },
@@ -64,6 +68,21 @@ export default {
     goToLeaderBoard (event, item) {
       event.stopPropagation()
       this.$router.push(`/courses/${this.courseId}/assignments/${item.id}/leaderboard`)
+    },
+    formatDate (dateString) {
+      var dateObj = new Date(dateString)
+      var date = dateObj.getDate()
+      var month = dateObj.getMonth()
+      var year = dateObj.getFullYear()
+      var hours = dateObj.getHours()
+      var minutes = dateObj.getMinutes()
+      if (hours < 10) {
+        hours = `0${hours}`
+      }
+      if (minutes < 10) {
+        minutes = `0${minutes}`
+      }
+      return `${date}/${month}/${year}`
     },
     loadHomeworkList () {
       CourseService.findHomeworkList(this.courseId, (response) => {

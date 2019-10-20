@@ -161,11 +161,6 @@ export default {
   downloadCSV: function (courseId, assignmentId, callback, errorHandler) {
     const targetPath = `${process.env.VUE_APP_API_BASE_URL}/courses/${courseId}/assignments/${assignmentId}/submissions/download-csv`
     window.open(targetPath)
-    // ApiClient.downloadCSV(targetPath, params, (response) => {
-    //   callback(response)
-    // }, (error) => {
-    //   errorHandler(error)
-    // })
   }
 }
 </script>

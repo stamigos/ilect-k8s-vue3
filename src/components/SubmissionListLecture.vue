@@ -14,14 +14,18 @@
                      name="search"
                      v-model="searchUser"
                      autocomplete="off"
-                     placeholder="Search Registration Name" >
+                     placeholder="Search Registration Name">
               </b-form-input>
               <b-input-group-append>
                 <b-button disabled="disabled"><i class="fas fa-search"></i></b-button>
               </b-input-group-append>
             </b-input-group>
           </div>
-          <div class="pt-5">
+          <div class="pt-3">
+            <div class="alert alert-dismissible alert-success" v-show="scoreSuccess">
+              <button type="button" class="close" @click="scoreSuccess = null">&times;</button>
+              <strong>Successfully scored!</strong>
+            </div>
             <b-table
               class="table-responsive"
               :items="filteredList"
@@ -68,7 +72,8 @@ export default {
       searchUser: '',
       courseId: '',
       assignment_name: null,
-      assignmentId: ''
+      assignmentId: '',
+      scoreSuccess: null
     }
   },
   computed: {
@@ -97,6 +102,7 @@ export default {
       this.submissionId = item.id
       ScoreService.scoreSubmission(this.courseId, this.assignmentId, this.submissionId, (response) => {
         console.log(response)
+        this.scoreSuccess = true
       }, (error) => {
         console.error(error)
       })
@@ -105,6 +111,7 @@ export default {
       console.log('scoreUserAll')
       ScoreService.scoreSubmissions(this.courseId, this.assignmentId, (response) => {
         console.log(response)
+        this.scoreSuccess = true
         // this.submissions = response.data.payload.submission
         // this.assignment_name = response.data.payload.assignment_name
       }, (error) => {

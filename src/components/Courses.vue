@@ -202,14 +202,12 @@ export default {
     loadCourses () {
       CourseService.updateToken(this.$store.state.authHeader)
       CourseService.findCourses((response) => {
-        console.log('findCourses:', response)
         this.courses = response.data.payload.courses
       }, (error) => {
         console.error(error)
       })
     },
     handleCourseClicked (course) {
-      this.$store.commit('COURSE_NAME', course.name)
       this.$router.push(`/courses/${course.id}`)
     }
   }

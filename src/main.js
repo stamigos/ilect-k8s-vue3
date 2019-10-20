@@ -10,6 +10,7 @@ import Vuex from 'vuex'
 import VueCookies from 'vue-cookies'
 import createPersistedState from 'vuex-persistedstate'
 import VueRouterPermissions from 'vue-router-permissions'
+import VueSocketIO from 'vue-socket.io'
 
 // eslint-disable-next-line
 import jQuery from 'jquery'
@@ -28,6 +29,18 @@ Vue.use(Vuex)
 Vue.use(VueCookies)
 
 Vue.use(VueRouterPermissions, router)
+
+const options = { path: '/socket.io/' } // Options object to pass into SocketIO
+
+if (window.WebSocket) {
+  Vue.use(
+    new VueSocketIO({
+      debug: false,
+      connection: 'http://0.0.0.0:5000',
+      options: options
+    })
+  )
+}
 
 const authenticate = Promise.resolve({ role: 'guest' })
 
