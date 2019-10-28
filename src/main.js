@@ -36,8 +36,7 @@ if (window.WebSocket) {
   Vue.use(
     new VueSocketIO({
       debug: false,
-      connection: 'http://0.0.0.0:5000',
-      options: options
+      connection: 'ws://0.0.0.0:5000'
     })
   )
 }

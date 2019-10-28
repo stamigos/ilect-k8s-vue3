@@ -15,6 +15,12 @@
               :sort-desc.sync="sortDesc"
               @row-clicked="rowClicked"
             >
+              <template slot="HEAD_assignment_type" slot-scope="HEAD_assignment_type">
+                  Type
+              </template>
+              <template slot="HEAD_submission_status" slot-scope="HEAD_submission_status">
+                  Status
+              </template>
               <template slot="deadline" slot-scope="deadline">
                   {{ formatDate(deadline.item.deadline) }}
               </template>
@@ -72,7 +78,7 @@ export default {
     formatDate (dateString) {
       var dateObj = new Date(dateString)
       var date = dateObj.getDate()
-      var month = dateObj.getMonth()
+      var month = dateObj.getMonth() + 1
       var year = dateObj.getFullYear()
       var hours = dateObj.getHours()
       var minutes = dateObj.getMinutes()

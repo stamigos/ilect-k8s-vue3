@@ -4,23 +4,44 @@
     <div class="row w-100">
       <course-side-bar :course-id="courseId"></course-side-bar>
       <div class="col-sm-8 offset-sm-1 pt-5">
+        <div class="alert alert-dismissible alert-warning" v-if="assignmentExpired">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>Warning: Due date passed</strong>
+        </div>
         <div class="container">
           <p class="text-secondary header">Assignment name</p>
           <p>{{assignment_name}}</p>
           <p class="text-secondary header">Student name</p>
-          <p v-if="submission.user_name">{{submission.user_name}}</p>
+          <p v-if="submission">{{submission.user_name}}</p>
           <p v-else="">{{$user.get()['username']}}</p>
           <p class="text-secondary header">Score</p>
-          <p>{{submission.score}}</p>
+          <p v-if="submission">{{submission.score}}</p>
           <p class="text-secondary header">Scored output logs</p>
-          <p class="logs">{{submission.output}}</p>
+          <p v-if="submission" class="logs">{{submission.output}}</p>
           <p class="text-secondary header">Add Your Submission</p>
           <div class="editor-submission">
             <editor id="editor" v-model="content" minLines="5" maxLines="10" showGutter="true" showLineNumbers="false" @init="editorInit" lang="python" theme="dracula" width="750px" height="300px"></editor>
           </div>
           <div class="mb-3">
-            <b-button variant="info" class="mr-3" v-on:click="addSubmission">Save</b-button>
-            <b-button variant="info" v-if="assignment_type === 'CSV'" @click="downloadCSV">Download CSV</b-button>
+            <b-button variant="info"
+                      class="mr-3"
+                      v-if="!assignmentExpired"
+                      v-on:click="createUpdateSubmission">
+                    Save
+            </b-button>
+            <b-button variant="info"
+                      class="mr-3"
+                      v-if="assignment_type === 'CSV'"
+                      @click="downloadCSV">
+                    Download CSV
+            </b-button>
+            <b-button v-if="assignment_type === 'CSV' && !assignmentExpired"
+                      type="button"
+                      variant="info"
+                      @click="$refs.fileSubmission.click()">
+                    Upload Submission CSV
+                    <input type="file" ref="fileSubmission" id="inputGroupFile01" v-on:change="uploadCSV()" style="display: none;" aria-describedby="inputGroupFileAddon01">
+            </b-button>
           </div>
         </div>
       </div>
@@ -41,9 +62,11 @@ export default {
       courseId: '',
       assignmentId: '',
       content: '',
-      submission: {},
+      submission: null,
       assignment_name: null,
-      assignment_type: null
+      assignment_type: null,
+      assignment_deadline: null,
+      assignmentExpired: null
     }
   },
   methods: {
@@ -52,8 +75,13 @@ export default {
         console.log(response)
         this.assignment_name = response.data.payload.assignment_name
         this.assignment_type = response.data.payload.assignment_type
+        this.assignment_deadline = response.data.payload.assignment_deadline
+
+        this.checkDeadline()
+
         if (response.data.payload.submission) {
           this.content = response.data.payload.submission.content
+          this.submission = {}
           this.submission.user_id = response.data.payload.submission.user_id
           this.submission.user_name = response.data.payload.submission.username
           this.submission.score = response.data.payload.submission.score
@@ -62,6 +90,13 @@ export default {
       }, (error) => {
         console.error(error)
       })
+    },
+    checkDeadline () {
+      var deadline = new Date(this.assignment_deadline)
+      var today = new Date()
+      if (deadline < today) {
+        this.assignmentExpired = true
+      }
     },
     editorInit (editor) {
       require('brace/mode/html')
@@ -99,12 +134,13 @@ export default {
       output.setOption('vScrollBarAlwaysVisible', true)
       output.setOption('theme', 'ace/theme/textmate')
     },
-    addSubmission () {
-      console.log('create')
+    createUpdateSubmission () {
+      console.log('create/update')
       console.log(this.content)
       const params = {
         content: this.content
       }
+      console.log('this.submission:', this.submission)
       CourseService.addSubmission(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
       }, (error) => {
@@ -112,7 +148,14 @@ export default {
       })
     },
     downloadCSV () {
-      CourseService.downloadCSV(this.courseId, this.assignmentId)
+      CourseService.downloadSubmissionCSV(this.courseId, this.assignmentId, this.fileSubmission)
+    },
+    uploadCSV () {
+      this.fileSubmission = this.$refs.fileSubmission.files[0]
+      CourseService.uploadSubmissionCSV(this.courseId, this.assignmentId, this.fileSubmission, (response) => {
+        console.log(response)
+        this.loadSubmission()
+      })
     }
   },
   created () {

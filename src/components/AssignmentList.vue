@@ -23,8 +23,8 @@
                 <template slot="deadline" slot-scope="deadline">
                   {{formatDate(deadline.item.deadline)}}
                 </template>
-                <template slot="cron" slot-scope="cron">
-                  {{cron.item.cron.minutes}} {{cron.item.cron.hours}} {{cron.item.cron.day}} {{cron.item.cron.month}} {{cron.item.cron.day_of_the_week}}
+                <template slot="cron" slot-scope="data">
+                  {{data.item.cron.minutes}} {{data.item.cron.hours}} {{data.item.cron.day}} {{data.item.cron.month}} {{data.item.cron.day_of_the_week}}
                 </template>
                 <template slot="HEAD_assignment_type" slot-scope="HEAD_assignment_type">
                   Type
@@ -109,36 +109,31 @@
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.minutes"
-                              placeholder="*">
+                              v-model="cron.minutes">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.hours"
-                              placeholder="*">
+                              v-model="cron.hours">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.day"
-                              placeholder="*">
+                              v-model="cron.day">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.month"
-                              placeholder="*">
+                              v-model="cron.month">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.day_of_the_week"
-                              placeholder="*">
+                              v-model="cron.day_of_the_week">
                 </b-form-input>
               </b-col>
             </b-row>
@@ -205,40 +200,35 @@
         <b-form-group id="form-cron-setting-group"
                       label="Cron setting (minutes, hours, day, month, day of the week):"
                       label-for="form-cron-setting-input">
-            <b-row>
+            <b-row v-if="form.cron">
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.minutes"
-                              placeholder="*">
+                              v-model="form.cron.minutes">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.hours"
-                              placeholder="*">
+                              v-model="form.cron.hours">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.day"
-                              placeholder="*">
+                              v-model="form.cron.day">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.month"
-                              placeholder="*">
+                              v-model="form.cron.month">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.day_of_the_week"
-                              placeholder="*">
+                              v-model="form.cron.day_of_the_week">
                 </b-form-input>
               </b-col>
             </b-row>
@@ -357,7 +347,7 @@ export default {
     updateAssignment (evt) {
       evt.preventDefault()
       this.$refs.updateAssignmentModal.hide()
-      const cron = this.cron
+      const cron = this.form.cron
       var _cronString = ''
       if (cron.minutes !== '' && cron.hours !== '' && cron.day !== '' &&
           cron.month !== '' && cron.day_of_the_week !== '') {
@@ -417,7 +407,7 @@ export default {
     formatDate (dateString) {
       var dateObj = new Date(dateString)
       var date = dateObj.getDate()
-      var month = dateObj.getMonth()
+      var month = dateObj.getMonth() + 1
       var year = dateObj.getFullYear()
       var hours = dateObj.getHours()
       var minutes = dateObj.getMinutes()

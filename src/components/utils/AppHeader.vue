@@ -48,7 +48,7 @@ export default {
       routes: {},
       // routes: {'notebook': '', 'vnc': ''}
       podStatus: 'None',
-      userName: 'irration',
+      userName: '',
       connectionLost: false
     }
   },

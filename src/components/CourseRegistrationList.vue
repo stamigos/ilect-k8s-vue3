@@ -76,12 +76,30 @@
                 <template slot="type" slot-scope="data">
                   <span v-if="data.item.desired_status === 'Running' && data.item.type == 0">CPU</span>
                   <span v-if="data.item.desired_status === 'Running' && data.item.type == 1">GPU</span>
+                  <b-form-select v-if="data.item.desired_status === 'Stopped' && pods[data.item.user_id].user_id === data.item.user_id" v-model="pods[data.item.user_id].instanceType" :options="instanceOptions"></b-form-select>
+                </template>
+                <template slot="HEAD_acc_runtime_cpu" slot-scope="HEAD_acc_runtime_cpu">
+                  Runtime CPU
+                </template>
+                <template slot="HEAD_acc_runtime_gpu" slot-scope="HEAD_acc_runtime_gpu">
+                  Runtime GPU
                 </template>
                 <template slot="HEAD_pod" slot-scope="pod">
 
                 </template>
                 <template slot="pod" slot-scope="data">
-                  <span style="white-space: nowrap;" v-if="data.item.desired_status === 'Running'">
+                  <span style="white-space: nowrap;" v-if="data.item.desired_status === 'Stopped'">
+                    <a v-if="!pods[data.item.user_id].statusLoading && !pods[data.item.user_id].processorSelected || pods[data.item.user_id].user_id !== data.item.user_id" class="mr-2" :id="`start-pod-${data.item.user_id}`" @click="startPod($event, data.item)">
+                      <i class="fas fa-play text-warning"></i>
+                    </a>
+                    <a v-if="!pods[data.item.user_id].statusLoading && pods[data.item.user_id].processorSelected && pods[data.item.user_id].user_id === data.item.user_id" class="mr-2" :id="`start-pod-${data.item.user_id}`" @click="startPod($event, data.item)">
+                      <i class="fas fa-play text-success"></i>
+                    </a>
+                    <b-tooltip :target="`start-pod-${data.item.user_id}`" triggers="hover">
+                      Start pod for user {{ data.item.user_name }}
+                    </b-tooltip>
+                  </span>
+                  <span style="white-space: nowrap;" v-if="!pods[data.item.user_id].statusLoading && data.item.desired_status === 'Running'">
                     <a class="mr-2" :id="`stop-pod-${data.item.user_id}`" @click="stopPod($event, data.item)">
                       <i class="fas fa-stop text-danger"></i>
                     </a>
@@ -89,6 +107,7 @@
                       Stop pod for user {{ data.item.user_name }}
                     </b-tooltip>
                   </span>
+                  <b-spinner v-if="pods[data.item.user_id].statusLoading && pods[data.item.user_id].user_id === data.item.user_id" variant="primary" type="grow" small label="Spinning"></b-spinner>
                 </template>
                 <template slot="HEAD_actions" slot-scope="actions">
 
@@ -268,7 +287,13 @@ export default {
       ],
       roleSelected: null,
       isExpandFailed: false,
-      isExpandSuccess: false
+      isExpandSuccess: false,
+      instanceType: 0,
+      instanceOptions: [
+        { value: 0, text: 'CPU' },
+        { value: 1, text: 'GPU' }
+      ],
+      pods: {}
     }
   },
   computed: {
@@ -310,7 +335,6 @@ export default {
         repeat_password: this.changePasswordForm.repeat_password
       }
       CourseService.updateRegistrationPassword(this.courseId, this.user_id, params, (response) => {
-        console.log('updateRegistrationPassword:', response)
         if (response.data.payload.success === true) {
           this.showAlert = true
           this.alertMessage = 'Password successfully updated!'
@@ -406,8 +430,19 @@ export default {
       CourseService.findRegistrations(this.courseId, (response) => {
         console.log(response)
         this.registrations = response.data.payload.registrations
+        this.initializePods()
       }, (error) => {
         console.error(error)
+      })
+    },
+    initializePods () {
+      this.registrations.forEach((registration) => {
+        this.pods[registration.user_id] = {
+          processorSelected: null,
+          statusLoading: null,
+          user_id: null,
+          instanceType: 0
+        }
       })
     },
     handleFileUploadGithub () {
@@ -442,22 +477,41 @@ export default {
       this.$refs.addRegistrationModal.hide()
       this.initForm()
     },
+    startPod (evt, item) {
+      if (this.pods[item.user_id].processorSelected === true) {
+        this.pods[item.user_id].statusLoading = true
+        const isGpu = (this.pods[item.user_id].instanceType === 1)
+        const params = { user: this.userName, user_id: item.user_id, is_gpu: isGpu }
+        PodService.startPod(this.courseId, params, (response) => {
+          this.pods[item.user_id].statusLoading = false
+          this.pods = { ...this.pods }
+          console.log(response)
+          this.loadRegistrations()
+        }, (error) => {
+          this.pods[item.user_id].statusLoading = false
+          this.pods = { ...this.pods }
+          console.error(error)
+        })
+      } else {
+        this.pods[item.user_id].processorSelected = true
+        this.pods[item.user_id].user_id = item.user_id
+        this.pods = { ...this.pods }
+      }
+    },
     stopPod (evt, item) {
-      const isGpu = (item.type === 1)
-      console.log('item:', item)
+      this.pods[item.user_id].statusLoading = true
+      this.pods[item.user_id].user_id = item.user_id
+      this.pods = { ...this.pods }
+      const isGpu = (this.pods[item.user_id].instanceType === 1)
       const params = { user: this.userName, user_id: item.user_id }
       PodService.stopPod(this.courseId, params, (response) => {
+        this.pods[item.user_id].statusLoading = false
+        this.pods = { ...this.pods }
         console.log(response)
-        // PodService.findRoutes(this.courseId, (routeRes) => {
-        //   this.routes = routeRes.data
-        // })
-        // PodService.findStatus(this.courseId, (podRes) => {
-        //   console.log(podRes)
-        //   this.podStatus = podRes.data.pod_status
-        // }, (error) => {
-        //   console.error(error)
-        // })
+        this.loadRegistrations()
       }, (error) => {
+        this.pods[item.user_id].statusLoading = false
+        this.pods = { ...this.pods }
         console.error(error)
       })
     }
