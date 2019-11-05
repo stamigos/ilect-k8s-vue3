@@ -265,9 +265,10 @@ export default {
         { key: 'acc_runtime_cpu', sortable: true },
         { key: 'acc_runtime_gpu', sortable: true },
         { key: 'desired_status', sortable: true },
-        { key: 'type', sortable: true },
+        { key: 'last_start', sortable: true },
         { key: 'provider', sortable: true },
         { key: 'active', sortable: true },
+        { key: 'type', sortable: true },
         { key: 'pod', sortable: false },
         { key: 'actions', sortable: false }
       ],

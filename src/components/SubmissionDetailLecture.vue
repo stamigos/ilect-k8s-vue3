@@ -11,6 +11,8 @@
           <p>{{submission.user_name}}</p>
           <p class="text-secondary header">Score</p>
           <p class="logs">{{submission.score}}</p>
+          <p class="text-secondary header">Last Scored Time</p>
+          <p v-if="submission">{{submission.last_scored_time}}</p>
           <p class="text-secondary header">Scored output logs</p>
           <p class="logs">
             {{submission.output}}
@@ -19,7 +21,7 @@
           <div class="editor-submission">
             <editor id="editor" v-model="content" @init="editorInit" lang="python" theme="dracula" width="750px" height="300px"></editor>
           </div>
-          <button class="btn btn-info button-submission" v-on:click="addSubmission">Save</button>
+          <!-- <button class="btn btn-info button-submission" v-on:click="addSubmission">Save</button> -->
         </div>
       </div>
     </div>
@@ -56,6 +58,7 @@ export default {
         this.submission.output = response.data.payload.submission.output
         this.submission.user_id = response.data.payload.submission.user_id
         this.submission.user_name = response.data.payload.submission.username
+        this.submission.last_scored_time = response.data.payload.submission.last_scored_time
         this.assignment_name = response.data.payload.assignment_name
       }, (error) => {
         console.error(error)

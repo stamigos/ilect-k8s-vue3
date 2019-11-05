@@ -109,34 +109,39 @@
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.minutes">
+                              v-model="form.cron.minutes">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.hours">
+                              v-model="form.cron.hours">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.day">
+                              v-model="form.cron.day">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.month">
+                              v-model="form.cron.month">
                 </b-form-input>
               </b-col>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
-                              v-model="cron.day_of_the_week">
+                              v-model="form.cron.day_of_the_week">
                 </b-form-input>
               </b-col>
             </b-row>
+        </b-form-group>
+        <b-form-group>
+          <b-form-checkbox v-model="form.is_cron_activated" id="form-is-cron-activated-input" name="check-button" switch>
+            Is cron activated
+          </b-form-checkbox>
         </b-form-group>
         <b-button type="submit" class="mr-3" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
@@ -200,7 +205,7 @@
         <b-form-group id="form-cron-setting-group"
                       label="Cron setting (minutes, hours, day, month, day of the week):"
                       label-for="form-cron-setting-input">
-            <b-row v-if="form.cron">
+            <b-row>
               <b-col sm="2">
                 <b-form-input id="form-cron-setting-input"
                               type="text"
@@ -232,6 +237,11 @@
                 </b-form-input>
               </b-col>
             </b-row>
+        </b-form-group>
+        <b-form-group>
+          <b-form-checkbox v-model="form.is_cron_activated" id="form-is-cron-activated-input" name="check-button" switch>
+            Is cron activated
+          </b-form-checkbox>
         </b-form-group>
         <b-button type="submit" class="mr-3" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
@@ -274,14 +284,15 @@ export default {
         description: '',
         command: '',
         assignment_type: 0,
-        deadline: ''
-      },
-      cron: {
-        minutes: '',
-        hours: '',
-        day: '',
-        month: '',
-        day_of_the_week: ''
+        deadline: '',
+        cron: {
+          minutes: '',
+          hours: '',
+          day: '',
+          month: '',
+          day_of_the_week: ''
+        },
+        is_cron_activated: null
       },
       courseId: '',
       courseName: '',
@@ -321,7 +332,9 @@ export default {
       evt.preventDefault()
       this.$refs.addAssignmentModal.hide()
       console.log(this.form)
-      const cron = this.cron
+      const cron = this.form.cron
+      console.log('form.is_cron_activated:', this.form.is_cron_activated)
+      const isCronActivated = this.form.is_cron_activated
       var _cronString = ''
       if (cron.minutes !== '' && cron.hours !== '' && cron.day !== '' &&
           cron.month !== '' && cron.day_of_the_week !== '') {
@@ -333,7 +346,8 @@ export default {
         command: this.form.command,
         description: this.form.description,
         assignment_type: this.form.assignment_type === 0 ? 'Python' : 'CSV',
-        cron: _cronString
+        cron: _cronString,
+        is_cron_activated: isCronActivated
       }
       CourseService.createAssignment(this.courseId, params, (response) => {
         console.log(response)
@@ -348,6 +362,8 @@ export default {
       evt.preventDefault()
       this.$refs.updateAssignmentModal.hide()
       const cron = this.form.cron
+      console.log('form.is_cron_activated:', this.form.is_cron_activated)
+      const isCronActivated = this.form.is_cron_activated
       var _cronString = ''
       if (cron.minutes !== '' && cron.hours !== '' && cron.day !== '' &&
           cron.month !== '' && cron.day_of_the_week !== '') {
@@ -359,7 +375,8 @@ export default {
         command: this.form.command,
         description: this.form.description,
         assignment_type: this.form.assignment_type === 0 ? 'Python' : 'CSV',
-        cron: _cronString
+        cron: _cronString,
+        is_cron_activated: isCronActivated
       }
       CourseService.updateAssignment(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
@@ -376,7 +393,18 @@ export default {
       this.form.command = assignment.command
       this.form.name = assignment.name
       this.form.description = assignment.description
-      this.form.cron = assignment.cron
+      if (assignment.cron === '') {
+        this.form.cron = {
+          minutes: '',
+          hours: '',
+          day: '',
+          month: '',
+          day_of_the_week: ''
+        }
+      } else {
+        this.form.cron = assignment.cron
+      }
+      this.form.is_cron_activated = assignment.is_cron_activated
       this.form.assignment_type = assignment.assignment_type === 'Python' ? 0 : 1
     },
     loadAssignments () {
@@ -403,6 +431,7 @@ export default {
         day_of_the_week: ''
       }
       this.form.assignment_type = 0
+      this.form.is_cron_activated = false
     },
     formatDate (dateString) {
       var dateObj = new Date(dateString)

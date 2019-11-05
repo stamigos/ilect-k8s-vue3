@@ -16,6 +16,8 @@
           <p v-else="">{{$user.get()['username']}}</p>
           <p class="text-secondary header">Score</p>
           <p v-if="submission">{{submission.score}}</p>
+          <p class="text-secondary header">Last Scored Time</p>
+          <p v-if="submission">{{submission.last_scored_time}}</p>
           <p class="text-secondary header">Scored output logs</p>
           <p v-if="submission" class="logs">{{submission.output}}</p>
           <p class="text-secondary header">Add Your Submission</p>
@@ -38,9 +40,16 @@
             <b-button v-if="assignment_type === 'CSV' && !assignmentExpired"
                       type="button"
                       variant="info"
+                      class="mr-3"
                       @click="$refs.fileSubmission.click()">
                     Upload Submission CSV
                     <input type="file" ref="fileSubmission" id="inputGroupFile01" v-on:change="uploadCSV()" style="display: none;" aria-describedby="inputGroupFileAddon01">
+            </b-button>
+            <b-button type="button"
+                      variant="info"
+                      @click="goToLeaderBoard($event)"
+                      v-if="submission && assignment_show_lb === true">
+                Go to LeaderBoard
             </b-button>
           </div>
         </div>
@@ -66,7 +75,8 @@ export default {
       assignment_name: null,
       assignment_type: null,
       assignment_deadline: null,
-      assignmentExpired: null
+      assignmentExpired: null,
+      assignment_show_lb: null
     }
   },
   methods: {
@@ -76,6 +86,7 @@ export default {
         this.assignment_name = response.data.payload.assignment_name
         this.assignment_type = response.data.payload.assignment_type
         this.assignment_deadline = response.data.payload.assignment_deadline
+        this.assignment_show_lb = response.data.payload.assignment_show_lb
 
         this.checkDeadline()
 
@@ -86,6 +97,7 @@ export default {
           this.submission.user_name = response.data.payload.submission.username
           this.submission.score = response.data.payload.submission.score
           this.submission.output = response.data.payload.submission.output
+          this.submission.last_scored_time = response.data.payload.submission.last_scored_time
         }
       }, (error) => {
         console.error(error)
@@ -97,6 +109,10 @@ export default {
       if (deadline < today) {
         this.assignmentExpired = true
       }
+    },
+    goToLeaderBoard (event) {
+      event.stopPropagation()
+      this.$router.push(`/courses/${this.courseId}/assignments/${this.assignmentId}/leaderboard`)
     },
     editorInit (editor) {
       require('brace/mode/html')
@@ -140,7 +156,6 @@ export default {
       const params = {
         content: this.content
       }
-      console.log('this.submission:', this.submission)
       CourseService.addSubmission(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
       }, (error) => {
