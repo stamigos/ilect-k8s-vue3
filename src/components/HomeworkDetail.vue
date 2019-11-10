@@ -6,9 +6,24 @@
       <div class="col-sm-8 offset-sm-1 pt-5">
         <div class="alert alert-dismissible alert-warning" v-if="assignmentExpired">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <strong>Warning: Due date passed</strong>
+          <strong>Warning: Due date passed</strong><a v-if="!isPermissionRequested" class="text-info" href="" @click="requestPermission"> -> Request permission of late submit </a><span v-if="submission.late_submit === 'Requested'"> -> Late Submit: Waiting for approval</span>
+        </div>
+        <div class="alert alert-dismissible alert-success" v-if="successMessage">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>{{successMessage}}</strong>
+        </div>
+        <div class="alert alert-dismissible alert-danger" v-if="errorMessage">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>{{errorMessage}}</strong>
         </div>
         <div class="container">
+          <b-button type="button"
+                    variant="info"
+                    style="float:right;"
+                    @click="goToLeaderBoard($event)"
+                    v-if="submission && assignment_show_lb === true">
+              Go to LeaderBoard >
+          </b-button>
           <p class="text-secondary header">Assignment name</p>
           <p>{{assignment_name}}</p>
           <p class="text-secondary header">Student name</p>
@@ -24,7 +39,7 @@
           <div class="editor-submission">
             <editor id="editor" v-model="content" minLines="5" maxLines="10" showGutter="true" showLineNumbers="false" @init="editorInit" lang="python" theme="dracula" width="750px" height="300px"></editor>
           </div>
-          <div class="mb-3">
+          <div class="mt-4 mb-5">
             <b-button variant="info"
                       class="mr-3"
                       v-if="!assignmentExpired"
@@ -44,12 +59,6 @@
                       @click="$refs.fileSubmission.click()">
                     Upload Submission CSV
                     <input type="file" ref="fileSubmission" id="inputGroupFile01" v-on:change="uploadCSV()" style="display: none;" aria-describedby="inputGroupFileAddon01">
-            </b-button>
-            <b-button type="button"
-                      variant="info"
-                      @click="goToLeaderBoard($event)"
-                      v-if="submission && assignment_show_lb === true">
-                Go to LeaderBoard
             </b-button>
           </div>
         </div>
@@ -76,7 +85,10 @@ export default {
       assignment_type: null,
       assignment_deadline: null,
       assignmentExpired: null,
-      assignment_show_lb: null
+      assignment_show_lb: null,
+      successMessage: false,
+      errorMessage: false,
+      isPermissionRequested: null
     }
   },
   methods: {
@@ -98,6 +110,8 @@ export default {
           this.submission.score = response.data.payload.submission.score
           this.submission.output = response.data.payload.submission.output
           this.submission.last_scored_time = response.data.payload.submission.last_scored_time
+          this.submission.late_submit = response.data.payload.submission.late_submit
+          this.isPermissionRequested = this.submission.late_submit === 'Requested' ? true : false
         }
       }, (error) => {
         console.error(error)
@@ -158,7 +172,11 @@ export default {
       }
       CourseService.addSubmission(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
+        if (response.data.status === 'ok') {
+          this.successMessage = 'Assignment submited!'
+        }
       }, (error) => {
+        this.errorMessage = error
         console.error(error)
       })
     },
@@ -170,6 +188,19 @@ export default {
       CourseService.uploadSubmissionCSV(this.courseId, this.assignmentId, this.fileSubmission, (response) => {
         console.log(response)
         this.loadSubmission()
+      })
+    },
+    requestPermission (e) {
+      e.preventDefault()
+      console.log('requested')
+      CourseService.requestPermission(this.courseId, this.assignmentId, (response) => {
+        console.log('response:', response)
+        this.isPermissionRequested = true
+        this.successMessage = 'Permission requested'
+      }, (error) => {
+        console.log('error:', error)
+        this.errorMessage = error
+        console.error(error)
       })
     }
   },

@@ -66,6 +66,7 @@ export default {
       fields: [
         { key: 'username', sortable: true },
         { key: 'score', sortable: true },
+        { key: 'last_scored_time', sortable: true },
         { key: 'score_all', sortable: false }
       ],
       submissions: [],
@@ -98,22 +99,20 @@ export default {
       this.$router.push(`/courses/${this.courseId}/assignments/${this.assignmentId}/submissions/${row.id}`)
     },
     scoreUser (item) {
-      console.log('item:', item)
       this.submissionId = item.id
       ScoreService.scoreSubmission(this.courseId, this.assignmentId, this.submissionId, (response) => {
         console.log(response)
         this.scoreSuccess = true
+        this.loadSubmissions()
       }, (error) => {
         console.error(error)
       })
     },
     scoreUserAll () {
-      console.log('scoreUserAll')
       ScoreService.scoreSubmissions(this.courseId, this.assignmentId, (response) => {
         console.log(response)
         this.scoreSuccess = true
-        // this.submissions = response.data.payload.submission
-        // this.assignment_name = response.data.payload.assignment_name
+        this.loadSubmissions()
       }, (error) => {
         console.error(error)
       })

@@ -5,6 +5,11 @@
       <course-side-bar :course-id="courseId"></course-side-bar>
       <div class="col-sm-8 offset-sm-1 pt-5">
         <div class="container">
+          <div class="alert alert-dismissible alert-success mb-3" v-if="submission.late_submit === 'Requested'">
+            <p>Student requested permission of late submit:</p>
+            <b-button type="submit" variant="primary" class="mr-2" v-b-modal.late-submit-modal>Approve</b-button>
+            <b-button type="reset" variant="danger" @click="onRejectLateSubmit">Reject</b-button>
+          </div>
           <p class="text-secondary header">Assignment name</p>
           <p>{{assignment_name}}</p>
           <p class="text-secondary header">Student name</p>
@@ -25,6 +30,30 @@
         </div>
       </div>
     </div>
+    <!-- late submit approval -->
+    <b-modal ref="lateSubmitModal"
+             id="late-submit-modal"
+             title="Late Submit Modal"
+             hide-footer>
+      <b-form @submit="onApproveLateSubmit" class="w-100">
+        <b-form-group id="form-late-submit-group"
+                      label="Due to date:"
+                      label-for="form-deadline-input"
+                      style="position: relative;margin-bottom: 80px;">
+            <flat-pickr id="form-late-submit-input"
+                        class="form-control"
+                        placeholder="Select due date"
+                        v-model="lateSubmitForm.lateSubmitDue"
+                        style="position: absolute; top:40px; left:0;z-index: 2">
+            </flat-pickr>
+            <b-form-input style="position: absolute; top:40px; left:0;z-index: 1" type="text" name="due-date" v-model="lateSubmitForm.lateSubmitDue" required>
+            </b-form-input>
+        </b-form-group>
+        <div slot="modal-footer" class="mt-5 w-100">
+          <b-button type="submit" variant="primary" class="mr-2">Approve</b-button>
+        </div>
+      </b-form>
+    </b-modal>
   </div>
 </template>
 
@@ -32,10 +61,12 @@
 import AppHeader from './utils/AppHeader'
 import CourseSideBar from './inc/CourseSideBar'
 import CourseService from './service/CourseService'
+import flatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 
 export default {
   name: 'SubmissionDetailLecture',
-  components: { CourseSideBar, AppHeader, editor: require('vue2-ace-editor') },
+  components: { CourseSideBar, AppHeader, editor: require('vue2-ace-editor'), 'flat-pickr': flatPickr },
   data () {
     return {
       courseId: '',
@@ -46,6 +77,9 @@ export default {
         user_id: null,
         score: null,
         output: null
+      },
+      lateSubmitForm: {
+        lateSubmitDue: null
       }
     }
   },
@@ -59,6 +93,7 @@ export default {
         this.submission.user_id = response.data.payload.submission.user_id
         this.submission.user_name = response.data.payload.submission.username
         this.submission.last_scored_time = response.data.payload.submission.last_scored_time
+        this.submission.late_submit = response.data.payload.submission.late_submit
         this.assignment_name = response.data.payload.assignment_name
       }, (error) => {
         console.error(error)
@@ -107,6 +142,28 @@ export default {
         content: this.content
       }
       CourseService.addSubmission(this.courseId, this.assignmentId, params, (response) => {
+        console.log(response)
+      }, (error) => {
+        console.error(error)
+      })
+    },
+    onApproveLateSubmit (e, item) {
+      const dueDate = this.lateSubmitForm.lateSubmitDue
+      const params = {
+        due_date: dueDate,
+        user_id: this.submission.user_id
+      }
+      CourseService.approveRequest(this.courseId, this.assignmentId, params, (response) => {
+        console.log(response)
+      }, (error) => {
+        console.error(error)
+      })
+    },
+    onRejectLateSubmit (e) {
+      const params = {
+        user_id: this.submission.user_id
+      }
+      CourseService.rejectRequest(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
       }, (error) => {
         console.error(error)

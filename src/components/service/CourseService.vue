@@ -169,6 +169,30 @@ export default {
     }, (error) => {
       errorHandler(error)
     })
+  },
+  requestPermission: function (courseId, assignmentId, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/assignments/${assignmentId}/submissions/request-permission`
+    ApiClient.update(targetPath, {}, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
+  approveRequest: function (courseId, assignmentId, params, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/assignments/${assignmentId}/submissions/request-permission/approve`
+    ApiClient.update(targetPath, params, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
+  rejectRequest: function (courseId, assignmentId, params, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/assignments/${assignmentId}/submissions/request-permission/reject`
+    ApiClient.update(targetPath, params, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
   }
 }
 </script>

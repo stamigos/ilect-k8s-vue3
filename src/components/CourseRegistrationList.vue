@@ -267,6 +267,7 @@ export default {
         { key: 'desired_status', sortable: true },
         { key: 'last_start', sortable: true },
         { key: 'provider', sortable: true },
+        { key: 'last_logged_in', sortable: true },
         { key: 'active', sortable: true },
         { key: 'type', sortable: true },
         { key: 'pod', sortable: false },

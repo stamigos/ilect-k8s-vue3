@@ -333,7 +333,6 @@ export default {
       this.$refs.addAssignmentModal.hide()
       console.log(this.form)
       const cron = this.form.cron
-      console.log('form.is_cron_activated:', this.form.is_cron_activated)
       const isCronActivated = this.form.is_cron_activated
       var _cronString = ''
       if (cron.minutes !== '' && cron.hours !== '' && cron.day !== '' &&
@@ -362,7 +361,6 @@ export default {
       evt.preventDefault()
       this.$refs.updateAssignmentModal.hide()
       const cron = this.form.cron
-      console.log('form.is_cron_activated:', this.form.is_cron_activated)
       const isCronActivated = this.form.is_cron_activated
       var _cronString = ''
       if (cron.minutes !== '' && cron.hours !== '' && cron.day !== '' &&
