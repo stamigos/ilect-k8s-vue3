@@ -6,7 +6,15 @@
       <div class="col-sm-8 offset-sm-1 pt-5">
         <div class="alert alert-dismissible alert-warning" v-if="assignmentExpired">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <strong>Warning: Due date passed</strong><a v-if="!isPermissionRequested" class="text-info" href="" @click="requestPermission"> -> Request permission of late submit </a><span v-if="submission.late_submit === 'Requested'"> -> Late Submit: Waiting for approval</span>
+          <strong>Warning: Due date passed</strong><a v-if="!isPermissionRequested && !rejected" class="text-info" href="" @click="requestPermission"> -> Request permission of late submit </a><span v-if="submission && submission.late_submit === 'Requested'"> -> Late Submit: Waiting for approval</span>
+        </div>
+        <div class="alert alert-dismissible alert-success" v-if="!rejected && submission && submission.late_submit === 'Approved'">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>Allowed late submit due date: {{ submission.late_submit_due_date }}</strong>
+        </div>
+        <div class="alert alert-dismissible alert-warning" v-if="rejected">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>Permission request rejected</strong>
         </div>
         <div class="alert alert-dismissible alert-success" v-if="successMessage">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -42,7 +50,7 @@
           <div class="mt-4 mb-5">
             <b-button variant="info"
                       class="mr-3"
-                      v-if="!assignmentExpired"
+                      v-if="!rejected && !assignmentExpired || submission && submission.late_submit === 'Approved'"
                       v-on:click="createUpdateSubmission">
                     Save
             </b-button>
@@ -52,7 +60,7 @@
                       @click="downloadCSV">
                     Download CSV
             </b-button>
-            <b-button v-if="assignment_type === 'CSV' && !assignmentExpired"
+            <b-button v-if="assignment_type === 'CSV' && !assignmentExpired || submission && submission.late_submit === 'Approved'"
                       type="button"
                       variant="info"
                       class="mr-3"
@@ -88,7 +96,8 @@ export default {
       assignment_show_lb: null,
       successMessage: false,
       errorMessage: false,
-      isPermissionRequested: null
+      isPermissionRequested: null,
+      rejected: null
     }
   },
   methods: {
@@ -111,15 +120,26 @@ export default {
           this.submission.output = response.data.payload.submission.output
           this.submission.last_scored_time = response.data.payload.submission.last_scored_time
           this.submission.late_submit = response.data.payload.submission.late_submit
-          this.isPermissionRequested = this.submission.late_submit === 'Requested' ? true : false
+          this.submission.late_submit_due_date = response.data.payload.submission.late_submit_due_date
+          this.checkDeadline(this.submission.late_submit)
+          this.isPermissionRequested = this.submission.late_submit === 'Requested'
         }
       }, (error) => {
         console.error(error)
       })
     },
-    checkDeadline () {
+    checkDeadline (lateSubmit) {
       var deadline = new Date(this.assignment_deadline)
       var today = new Date()
+      if (lateSubmit === 'Approved') {
+        this.assignmentExpired = null
+        return
+      }
+      if (lateSubmit === 'Rejected') {
+        this.assignmentExpired = null
+        this.rejected = true
+        return
+      }
       if (deadline < today) {
         this.assignmentExpired = true
       }
@@ -192,11 +212,11 @@ export default {
     },
     requestPermission (e) {
       e.preventDefault()
-      console.log('requested')
       CourseService.requestPermission(this.courseId, this.assignmentId, (response) => {
         console.log('response:', response)
         this.isPermissionRequested = true
         this.successMessage = 'Permission requested'
+        window.location.reload()
       }, (error) => {
         console.log('error:', error)
         this.errorMessage = error

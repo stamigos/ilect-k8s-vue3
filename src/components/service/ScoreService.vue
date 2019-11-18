@@ -42,6 +42,14 @@ export default {
     const baseApi = process.env.VUE_APP_API_BASE_URL
     const targetPath = `${baseApi}/courses/${courseId}/score/assignments/${assignmentId}/submissions/download-csv`
     window.open(targetPath)
+  },
+  getScoringStatus: function (courseId, assignmentId, submissionId, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/score/assignments/${assignmentId}/submissions/${submissionId}/status`
+    ApiClient.search(targetPath, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
   }
 }
 </script>

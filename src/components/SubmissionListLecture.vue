@@ -3,7 +3,7 @@
     <app-header></app-header>
     <div class="row w-100">
       <course-side-bar :course-id="courseId"></course-side-bar>
-      <div class="col-sm-8 pt-5">
+      <div class="col-sm-10 pt-5">
         <div class="container">
           <p class="text-secondary header">Assignment name</p>
           <p>{{assignment_name}}</p>
@@ -26,6 +26,10 @@
               <button type="button" class="close" @click="scoreSuccess = null">&times;</button>
               <strong>Successfully scored!</strong>
             </div>
+            <div class="alert alert-dismissible alert-danger" v-show="errorMessage">
+              <button type="button" class="close" @click="errorMessage = null">&times;</button>
+              <strong>{{errorMessage}}</strong>
+            </div>
             <b-table
               class="table-responsive"
               :items="filteredList"
@@ -39,6 +43,20 @@
               </template>
               <template slot="score_all" slot-scope="score_all">
                   <b-button variant="primary" size="sm" @click="scoreUser(score_all.item)">Score</b-button>
+              </template>
+
+              <template slot="HEAD_scoring_status" slot-scope="scoring_status">
+                Scoring Status
+              </template>
+              <template slot="scoring_status" slot-scope="data">
+                <b-row>
+                  <b-col>
+                    <span v-if="scoringStatuses[data.item.id]">{{ scoringStatuses[data.item.id] }}</span>
+                  </b-col>
+                  <b-col>
+                    <b-button variant="success" size="sm" @click="getScoringStatus(data.item)">Check</b-button>
+                  </b-col>
+                </b-row>
               </template>
             </b-table>
           </div>
@@ -67,14 +85,17 @@ export default {
         { key: 'username', sortable: true },
         { key: 'score', sortable: true },
         { key: 'last_scored_time', sortable: true },
-        { key: 'score_all', sortable: false }
+        { key: 'score_all', sortable: false },
+        { key: 'scoring_status', sortable: false }
       ],
       submissions: [],
       searchUser: '',
       courseId: '',
       assignment_name: null,
       assignmentId: '',
-      scoreSuccess: null
+      scoreSuccess: null,
+      errorMessage: null,
+      scoringStatuses: {}
     }
   },
   computed: {
@@ -103,8 +124,10 @@ export default {
       ScoreService.scoreSubmission(this.courseId, this.assignmentId, this.submissionId, (response) => {
         console.log(response)
         this.scoreSuccess = true
+        this.getScoringStatus(item)
         this.loadSubmissions()
       }, (error) => {
+        this.errorMessage = error
         console.error(error)
       })
     },
@@ -114,6 +137,32 @@ export default {
         this.scoreSuccess = true
         this.loadSubmissions()
       }, (error) => {
+        this.errorMessage = error
+        console.error(error)
+      })
+    },
+    getScoringStatus (item) {
+      this.submissionId = item.id
+      ScoreService.getScoringStatus(this.courseId, this.assignmentId, this.submissionId, (response) => {
+        console.log(response)
+        if (response.data.error) {
+          this.errorMessage = response.data.error
+        } else {
+          console.log('response:', response.data)
+          if (response.data.succeeded === null) {
+            if (response.data.conditions) {
+              this.scoringStatuses[item.id] = response.data.conditions[0].message
+            } else {
+              this.scoringStatuses[item.id] = response.data
+            }
+          } else {
+            this.scoringStatuses[item.id] = response.data
+          }
+          this.scoringStatuses = Object.assign({}, this.scoringStatuses)
+          console.log('this.scoringStatuses:', this.scoringStatuses)
+        }
+      }, (error) => {
+        this.errorMessage = error
         console.error(error)
       })
     },
@@ -123,6 +172,7 @@ export default {
         this.submissions = response.data.payload.submission
         this.assignment_name = response.data.payload.assignment_name
       }, (error) => {
+        this.errorMessage = error
         console.error(error)
       })
     }

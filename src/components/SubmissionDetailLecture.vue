@@ -5,10 +5,18 @@
       <course-side-bar :course-id="courseId"></course-side-bar>
       <div class="col-sm-8 offset-sm-1 pt-5">
         <div class="container">
-          <div class="alert alert-dismissible alert-success mb-3" v-if="submission.late_submit === 'Requested'">
+          <div class="alert alert-dismissible alert-success mb-3" v-if="!isRejected && submission && submission.late_submit === 'Requested' && !isApproved">
             <p>Student requested permission of late submit:</p>
             <b-button type="submit" variant="primary" class="mr-2" v-b-modal.late-submit-modal>Approve</b-button>
             <b-button type="reset" variant="danger" @click="onRejectLateSubmit">Reject</b-button>
+          </div>
+          <div class="alert alert-dismissible alert-success mb-3" v-if="isApproved">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Request approved!</strong>
+          </div>
+          <div class="alert alert-dismissible alert-success mb-3" v-if="isRejected">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Request rejected!</strong>
           </div>
           <p class="text-secondary header">Assignment name</p>
           <p>{{assignment_name}}</p>
@@ -80,7 +88,9 @@ export default {
       },
       lateSubmitForm: {
         lateSubmitDue: null
-      }
+      },
+      isApproved: null,
+      isRejected: null
     }
   },
   methods: {
@@ -148,6 +158,8 @@ export default {
       })
     },
     onApproveLateSubmit (e, item) {
+      e.preventDefault()
+      this.$refs.lateSubmitModal.hide()
       const dueDate = this.lateSubmitForm.lateSubmitDue
       const params = {
         due_date: dueDate,
@@ -155,16 +167,21 @@ export default {
       }
       CourseService.approveRequest(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
+        this.isApproved = true
       }, (error) => {
         console.error(error)
       })
     },
     onRejectLateSubmit (e) {
+      e.preventDefault()
+      this.$refs.lateSubmitModal.hide()
       const params = {
         user_id: this.submission.user_id
       }
       CourseService.rejectRequest(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
+        this.isApproved = false
+        this.isRejected = true
       }, (error) => {
         console.error(error)
       })

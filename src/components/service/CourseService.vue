@@ -193,6 +193,30 @@ export default {
     }, (error) => {
       errorHandler(error)
     })
+  },
+  createCourseContainer: function (courseId, params, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/containers`
+    ApiClient.create(targetPath, params, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
+  updateCourseContainer: function (courseId, containerId, params, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/containers/${containerId}`
+    ApiClient.update(targetPath, params, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
+  deleteCourseContainer: function (courseId, containerId, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/containers/${containerId}`
+    ApiClient.destroyWithPath(targetPath, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
   }
 }
 </script>
