@@ -32,11 +32,15 @@ Vue.use(VueRouterPermissions, router)
 
 const options = { path: '/socket.io/' } // Options object to pass into SocketIO
 
+// connection: 'ws://0.0.0.0:5000'
+console.log('---------')
+console.log(process.env)
+console.log('---------')
 if (window.WebSocket) {
   Vue.use(
     new VueSocketIO({
-      debug: false,
-      connection: 'ws://0.0.0.0:5000'
+      debug: true,
+      connection: process.env.VUE_APP_WS_BASE_URL
     })
   )
 }
