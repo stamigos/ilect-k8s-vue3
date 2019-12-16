@@ -52,6 +52,7 @@
                 <b-row>
                   <b-col>
                     <span v-if="scoringStatuses[data.item.id]">{{ scoringStatuses[data.item.id] }}</span>
+                    <span v-else="">{{ data.item.scoring_status }}</span>
                   </b-col>
                   <b-col>
                     <b-button variant="success" size="sm" @click="getScoringStatus(data.item)">Check</b-button>
@@ -148,18 +149,8 @@ export default {
         if (response.data.error) {
           this.errorMessage = response.data.error
         } else {
-          console.log('response:', response.data)
-          if (response.data.succeeded === null) {
-            if (response.data.conditions) {
-              this.scoringStatuses[item.id] = response.data.conditions[0].message
-            } else {
-              this.scoringStatuses[item.id] = response.data
-            }
-          } else {
-            this.scoringStatuses[item.id] = response.data
-          }
+          this.scoringStatuses[item.id] = response.data
           this.scoringStatuses = Object.assign({}, this.scoringStatuses)
-          console.log('this.scoringStatuses:', this.scoringStatuses)
         }
       }, (error) => {
         this.errorMessage = error

@@ -24,11 +24,11 @@
             <b-col>
               <div class="d-inline-block">
                 <b-button-group>
-                  <button class="btn btn-info btn-lg" v-on:click="startPod">
+                  <button class="btn btn-info btn-lg" v-on:click="startPod" :disabled="isLoadingStart">
                     <span v-if="!isLoadingStart">Start</span>
                     <b-spinner v-if="isLoadingStart" variant="primary" label="Spinning"></b-spinner>
                   </button>
-                  <button class="btn btn-danger btn-lg" v-on:click="stopPod">
+                  <button class="btn btn-danger btn-lg" v-on:click="stopPod" :disabled="isLoadingStop">
                     <span v-if="!isLoadingStop">Stop</span>
                     <b-spinner v-if="isLoadingStop" variant="primary" label="Spinning"></b-spinner>
                   </button>
@@ -159,8 +159,8 @@ export default {
             }
           }, (error) => {
             self.isLoadingStart = false
-            this.errorFlag = true
-            this.errorMessage = error.response.data.reason
+            self.errorFlag = true
+            self.errorMessage = error.response.data.reason
             clearInterval(timerId)
             console.error(error)
           })
@@ -173,16 +173,28 @@ export default {
     },
     stopPod () {
       const params = { user: this.userName }
+      this.isLoadingStop = true
       PodService.stopPod(this.courseId, params, (response) => {
         console.log(response)
         PodService.findRoutes(this.courseId, (routeRes) => {
           this.routes = routeRes.data
         })
-        PodService.findStatus(this.courseId, (podRes) => {
-          console.log(podRes)
-          this.podStatus = podRes.data.pod_status
-        }, (error) => {
-          console.error(error)
+        var self = this
+        var timerId = setTimeout(() => {
+          PodService.findStatus(this.courseId, (podRes) => {
+            console.log(podRes)
+            self.podStatus = podRes.data.pod_status
+            console.log(podRes)
+            if (podRes.data.pod_status === 'Stop') {
+              self.isLoadingStop = false
+              clearInterval(timerId)
+            }
+          }, (error) => {
+            self.isLoadingStop = false
+            self.errorFlag = true
+            self.errorMessage = error.response.data.reason
+            console.error(error)
+          })
         })
       }, (error) => {
         console.error(error)
