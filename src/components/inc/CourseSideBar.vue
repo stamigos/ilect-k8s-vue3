@@ -38,6 +38,7 @@
             </a>
           </router-link>
         </div>
+        <!--
         <div class="menu-item" v-if="user.role === 'lecturer'">
           <eva-icon name="cube" animation="pulse" fill="#263238"></eva-icon>
           <router-link :to="`/courses/${courseId}/containers`">
@@ -50,6 +51,7 @@
             <a style="color: #263238;">Settings</a>
           </router-link>
         </div>
+        -->
         <hr>
       </div>
     </transition>
