@@ -46,7 +46,7 @@
               </template>
 
               <template slot="HEAD_scoring_status" slot-scope="scoring_status">
-                Scoring Status
+                Scoring Result
               </template>
               <template slot="scoring_status" slot-scope="data">
                 <b-row>
@@ -125,7 +125,9 @@ export default {
       ScoreService.scoreSubmission(this.courseId, this.assignmentId, this.submissionId, (response) => {
         console.log(response)
         this.scoreSuccess = true
-        this.getScoringStatus(item)
+        setTimeout(() => {
+          this.getScoringStatus(item)
+        }, 5000)
         this.loadSubmissions()
       }, (error) => {
         this.errorMessage = error

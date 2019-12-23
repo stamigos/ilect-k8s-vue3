@@ -5,6 +5,12 @@
       <course-side-bar :course-id="courseId"></course-side-bar>
       <div class="col-sm-8 pt-5">
         <div class="container">
+          <b-row class="col-sm-6">
+            <div class="alert alert-dismissible alert-success" v-show="showAlert">
+              <button type="button" class="close" @click="showAlert = false">&times;</button>
+              <strong>{{ alertMessage }}</strong>
+            </div>
+          </b-row>
           <div class="alert alert-dismissible alert-success" v-show="successFlag">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
             <strong>{{ successMessage }}</strong>
@@ -56,12 +62,6 @@
             </b-col>
           </b-row>
           <hr v-if="resttime">
-          <b-row class="col-sm-6">
-            <div class="alert alert-dismissible alert-success" v-show="showAlert">
-              <button type="button" class="close" @click="showAlert = false">&times;</button>
-              <strong>{{ alertMessage }}</strong>
-            </div>
-          </b-row>
           <b-row class="col-sm-7" v-if="Object.keys(routes).length > 0 && podStatus === 'Running'">
             <b-col>
                 <button class="btn btn-info mr-3">
@@ -107,7 +107,9 @@ export default {
       extendOptions: [
         { value: 10, text: '10 min' },
         { value: 20, text: '20 min' },
-        { value: 60, text: '60 min' }
+        { value: 60, text: '60 min' },
+        { value: 90, text: '90 min' },
+        { value: 120, text: '120 min' }
       ],
       isLoadingStart: false,
       isLoadingStop: false,
@@ -149,9 +151,8 @@ export default {
           }, 30000)
         })
         var self = this
-        var timerId = setTimeout(() => {
+        var timerId = setInterval(() => {
           PodService.findStatus(self.courseId, (podRes) => {
-            console.log(podRes)
             self.podStatus = podRes.data.pod_status
             if (podRes.data.pod_status === 'Running') {
               self.isLoadingStart = false
@@ -161,10 +162,10 @@ export default {
             self.isLoadingStart = false
             self.errorFlag = true
             self.errorMessage = error.response.data.reason
-            clearInterval(timerId)
             console.error(error)
+            clearInterval(timerId)
           })
-        }, 5000)
+        }, 3000)
       }, (error) => {
         console.error(error)
         this.errorFlag = true
@@ -180,7 +181,7 @@ export default {
           this.routes = routeRes.data
         })
         var self = this
-        var timerId = setTimeout(() => {
+        var timerId = setInterval(() => {
           PodService.findStatus(this.courseId, (podRes) => {
             console.log(podRes)
             self.podStatus = podRes.data.pod_status
@@ -195,7 +196,7 @@ export default {
             self.errorMessage = error.response.data.reason
             console.error(error)
           })
-        })
+        }, 3000)
       }, (error) => {
         console.error(error)
       })

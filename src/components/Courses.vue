@@ -26,7 +26,7 @@
             </b-form>
           </div>
 
-          <div class="col-sm-10 offset-sm-2 pt-5">
+          <div class="col-sm-12 offset-sm-2 pt-5">
               <div class="alert alert-dismissible alert-success" v-show="createSuccess">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
                 <strong>Course Created!</strong>
@@ -41,6 +41,11 @@
               >
                 <template slot="notifications">
                     <i class="far fa-bell"></i>
+                </template>
+                <template slot="actions" slot-scope="data">
+                    <a class="mr-2" @click="selectCourse($event, data.item)" v-b-modal.update-course-modal>
+                      <i class="fas fa-edit text-primary"></i>
+                    </a>
                 </template>
               </b-table>
               <div class="text-center" v-if="!isLoadMore && filteredList.length > 5">
@@ -63,7 +68,7 @@
                       label-for="form-name-input">
             <b-form-input id="form-name-input"
                           type="text"
-                          v-model="addCourseForm.name"
+                          v-model="form.name"
                           required
                           placeholder="Enter name">
             </b-form-input>
@@ -72,7 +77,7 @@
                       label="Description:"
                       label-for="form-description-input">
             <b-form-textarea id="form-description-input"
-                             v-model="addCourseForm.description"
+                             v-model="form.description"
                              placeholder="Enter description..."
                              rows="3"
                              max-rows="6"
@@ -85,7 +90,7 @@
             <flat-pickr id="form-start-input"
                         class="form-control"
                         placeholder="Select start date"
-                        v-model="addCourseForm.start">
+                        v-model="form.start">
             </flat-pickr>
         </b-form-group>
         <b-form-group id="form-end-group"
@@ -94,10 +99,99 @@
             <flat-pickr id="form-end-input"
                         class="form-control"
                         placeholder="Select end date"
-                        v-model="addCourseForm.end">
+                        v-model="form.end">
             </flat-pickr>
         </b-form-group>
-        <b-button type="submit" variant="primary">Submit</b-button>
+        <b-form-group id="form-billing-tag-group"
+                      label="Billing tag:"
+                      label-for="form-billing-tag-input">
+            <b-form-input id="form-billing-tag-input"
+                          type="text"
+                          v-model="form.billing_tag"
+                          required
+                          placeholder="Enter billing tag">
+            </b-form-input>
+        </b-form-group>
+        <b-form-group id="form-duration-group"
+                      label="Duration:"
+                      label-for="form-duration-input">
+            <b-form-input id="form-duration-input"
+                          type="number"
+                          v-model="form.duration"
+                          required
+                          placeholder="Enter duration">
+            </b-form-input>
+        </b-form-group>
+        <b-button type="submit" class="mr-3" variant="primary">Submit</b-button>
+        <b-button type="reset" class="mr-3" variant="danger">Reset</b-button>
+      </b-form>
+    </b-modal>
+    <!-- update course modal -->
+    <b-modal ref="updateCourseModal"
+             id="update-course-modal"
+             title="Update course"
+             hide-footer>
+      <b-form @submit="updateCourse" @reset="onReset" class="w-100">
+        <b-form-group id="form-name-group"
+                      label="Name:"
+                      label-for="form-name-input">
+            <b-form-input id="form-name-input"
+                          type="text"
+                          v-model="form.name"
+                          required
+                          placeholder="Enter name">
+            </b-form-input>
+        </b-form-group>
+        <b-form-group id="form-description-group"
+                      label="Description:"
+                      label-for="form-description-input">
+            <b-form-textarea id="form-description-input"
+                             v-model="form.description"
+                             placeholder="Enter description..."
+                             rows="3"
+                             max-rows="6"
+                             required
+            ></b-form-textarea>
+        </b-form-group>
+        <b-form-group id="form-start-group"
+                      label="Start Date:"
+                      label-for="form-start-input">
+            <flat-pickr id="form-start-input"
+                        class="form-control"
+                        placeholder="Select start date"
+                        v-model="form.start">
+            </flat-pickr>
+        </b-form-group>
+        <b-form-group id="form-end-group"
+                      label="End Date:"
+                      label-for="form-end-input">
+            <flat-pickr id="form-end-input"
+                        class="form-control"
+                        placeholder="Select end date"
+                        v-model="form.end">
+            </flat-pickr>
+        </b-form-group>
+        <b-form-group id="form-billing-tag-group"
+                      label="Billing tag:"
+                      label-for="form-billing-tag-input">
+            <b-form-input id="form-billing-tag-input"
+                          type="text"
+                          v-model="form.billing_tag"
+                          required
+                          placeholder="Enter billing tag">
+            </b-form-input>
+        </b-form-group>
+        <b-form-group id="form-duration-group"
+                      label="Duration:"
+                      label-for="form-duration-input">
+            <b-form-input id="form-duration-input"
+                          type="number"
+                          v-model="form.duration"
+                          required
+                          placeholder="Enter duration">
+            </b-form-input>
+        </b-form-group>
+        <b-button type="submit" class="mr-3" variant="primary">Submit</b-button>
         <b-button type="reset" class="mr-3" variant="danger">Reset</b-button>
       </b-form>
     </b-modal>
@@ -123,12 +217,15 @@ export default {
         { key: 'description', sortable: true },
         { key: 'start', sortable: true },
         { key: 'end', sortable: true },
-        { key: 'notifications', sortable: false }
+        { key: 'billing_tag', sortable: true },
+        { key: 'duration', sortable: true },
+        { key: 'notifications', sortable: false },
+        { key: 'actions', sortable: false }
       ],
       courses: [],
       clicked: false,
       buttonMessage: 'Create Course',
-      addCourseForm: {
+      form: {
         name: '',
         description: '',
         start: '',
@@ -174,10 +271,12 @@ export default {
       return this.isLoadMore ? courses : courses.slice(0, 5)
     },
     initForm () {
-      this.addCourseForm.name = ''
-      this.addCourseForm.description = ''
-      this.addCourseForm.start = ''
-      this.addCourseForm.end = ''
+      this.form.name = ''
+      this.form.description = ''
+      this.form.start = ''
+      this.form.end = ''
+      this.form.billing_tag = ''
+      this.form.duration = ''
     },
     onReset (evt) {
       evt.preventDefault()
@@ -187,11 +286,26 @@ export default {
     createCourse (evt) {
       evt.preventDefault()
       this.$refs.addCourseModal.hide()
-      console.log(this.addCourseForm)
-      const params = this.addCourseForm
+      console.log(this.form)
+      const params = this.form
       CourseService.createCourse(params, (response) => {
         console.log(response)
         this.createSuccess = true
+        this.clicked = false
+        this.loadCourses()
+        this.initForm()
+      }, (error) => {
+        console.error(error)
+      })
+    },
+    updateCourse (evt) {
+      evt.preventDefault()
+      this.$refs.updateCourseModal.hide()
+      console.log(this.form)
+      const params = this.form
+      CourseService.updateCourse(this.courseId, params, (response) => {
+        console.log(response)
+        this.updateSuccess = true
         this.clicked = false
         this.loadCourses()
         this.initForm()
@@ -209,6 +323,15 @@ export default {
     },
     handleCourseClicked (course) {
       this.$router.push(`/courses/${course.id}`)
+    },
+    selectCourse (evt, course) {
+      this.courseId = course.id
+      this.form.name = course.name
+      this.form.description = course.description
+      this.form.start = course.start
+      this.form.end = course.end
+      this.form.billing_tag = course.billing_tag
+      this.form.duration = course.duration
     }
   }
 }
@@ -228,7 +351,7 @@ export default {
   }
   .form-group {
     position: relative;
-    padding: 2vh 10vw 2vh 10vw;
+    // padding: 2vh 10vw 2vh 10vw;
     /*width: 80vw;*/
   }
   .content-group {

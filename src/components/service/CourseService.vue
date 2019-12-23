@@ -36,6 +36,14 @@ export default {
       errorHandler(error)
     })
   },
+  updateCourse: function (courseId, params, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}`
+    ApiClient.update(targetPath, params, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
   findStatus: function (courseId, params, callback, errorHandler) {
     const targetPath = `/course/${courseId}/status`
     ApiClient.create(targetPath, params, (response) => {
