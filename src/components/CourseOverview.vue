@@ -22,7 +22,7 @@
           <b-row class="col-sm-4">
             <b-col>
               <h5 class="text-dark">Instance Type</h5>
-              <b-form-select v-model="instanceType" :options="instanceOptions"></b-form-select>
+              <b-form-select :disabled="Object.keys(routes).length > 0 && podStatus === 'Running'" v-model="instanceType" :options="instanceOptions"></b-form-select>
             </b-col>
           </b-row>
           <hr>
@@ -48,7 +48,7 @@
           <hr>
           <b-row class="col-sm-3">
             <b-col>
-              <b-form-select v-model="updateRegistrationForm.deadline" :options="extendOptions"></b-form-select>
+              <b-form-select v-model="updateRegistrationForm.duration" :options="extendOptions"></b-form-select>
             </b-col>
             <b-col>
               <button class="btn btn-info btn-md mt-3" v-on:click="extend">Extend</button>
@@ -102,7 +102,7 @@ export default {
       routes: [],
       podStatus: {},
       updateRegistrationForm: {
-        deadline: 20
+        duration: 20
       },
       extendOptions: [
         { value: 10, text: '10 min' },
@@ -232,7 +232,7 @@ export default {
     extend (evt) {
       evt.preventDefault()
       const params = {
-        deadline: this.updateRegistrationForm.deadline
+        duration: this.updateRegistrationForm.duration
       }
       CourseService.extendDeadline(this.courseId, params, (response) => {
         console.log(response)

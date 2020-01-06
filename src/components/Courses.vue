@@ -7,7 +7,7 @@
           <div class="col-sm-10 offset-sm-1 dropdown">
             <b-form @submit.prevent inline>
               <div class="col-sm-3">
-                <button v-if="user.role === 'lecturer'" type="button" class="btn btn-outline-info mr-3" v-b-modal.course-modal>{{ buttonMessage }}</button>
+                <button v-if="user.role === 'lecturer'" type="button" class="btn btn-outline-info mr-3" @click="createCourseInitial" v-b-modal.course-modal>{{ buttonMessage }}</button>
               </div>
               <div class="col-sm-9">
                 <b-input-group>
@@ -251,6 +251,9 @@ export default {
     }
   },
   methods: {
+    createCourseInitial () {
+      this.initForm()
+    },
     changeClick () {
       if (this.clicked) {
         this.clicked = false
