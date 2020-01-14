@@ -17,26 +17,26 @@
                 :sort-desc.sync="sortDesc"
                 @row-clicked="rowClicked"
               >
-                <template slot="HEAD_cron" slot-scope="HEAD_cron">
+                <template v-slot:head(cron)="cron">
                   Cron
                 </template>
-                <template slot="deadline" slot-scope="deadline">
-                  {{formatDate(deadline.item.deadline)}}
+                <template v-slot:cell(deadline)="data">
+                  {{formatDate(data.item.deadline)}}
                 </template>
-                <template slot="cron" slot-scope="data">
+                <template v-slot:cell(cron)="data">
                   {{data.item.cron.minutes}} {{data.item.cron.hours}} {{data.item.cron.day}} {{data.item.cron.month}} {{data.item.cron.day_of_the_week}}
                 </template>
-                <template slot="HEAD_assignment_type" slot-scope="HEAD_assignment_type">
+                <template v-slot:head(assignment_type)="assignment_type">
                   Type
                 </template>
-                <template slot="leader_board" slot-scope="leader_board">
+                <template v-slot:cell(leader_board)="leader_board">
                   <div @click="toggleDisplayLeaderboard($event, leader_board.item)">
                     <i class="fa fa-eye" v-if="leader_board.item.show_lb === true" aria-hidden="true"></i>
                     <i class="fa fa-eye-slash" v-else="" aria-hidden="true"></i>
                   </div>
                 </template>
-                <template slot="actions" slot-scope="data">
-                    <a class="mr-2" @click="selectAssignment($event, data.item)" v-b-modal.update-assignment-modal>
+                <template v-slot:cell(actions)="data">
+                    <a class="mr-2" @click="selectAssignment($event, data.item); $bvModal.show('update-assignment-modal')">
                       <i class="fas fa-edit text-primary"></i>
                     </a>
                 </template>
@@ -386,6 +386,7 @@ export default {
       })
     },
     selectAssignment (evt, assignment) {
+      evt.stopPropagation()
       this.assignmentId = assignment.id
       this.form.deadline = assignment.deadline
       this.form.command = assignment.command

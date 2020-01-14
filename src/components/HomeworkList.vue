@@ -15,13 +15,13 @@
               :sort-desc.sync="sortDesc"
               @row-clicked="rowClicked"
             >
-              <template slot="HEAD_assignment_type" slot-scope="HEAD_assignment_type">
+              <template v-slot:head(assignment_type)="assignment_type">
                   Type
               </template>
-              <template slot="HEAD_submission_status" slot-scope="HEAD_submission_status">
+              <template v-slot:head(submission_status)="submission_status">
                   Status
               </template>
-              <template slot="deadline" slot-scope="deadline">
+              <template v-slot:cell(deadline)="deadline">
                   {{ formatDate(deadline.item.deadline) }}
               </template>
             </b-table>

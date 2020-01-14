@@ -70,24 +70,24 @@
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
               >
-                <template slot="HEAD_type" slot-scope="data">
+                <template v-slot:head(type)="type">
                   CPU/GPU
                 </template>
-                <template slot="type" slot-scope="data">
+                <template v-slot:cell(type)="data">
                   <span v-if="data.item.desired_status === 'Running' && data.item.type == 0">CPU</span>
                   <span v-if="data.item.desired_status === 'Running' && data.item.type == 1">GPU</span>
-                  <b-form-select v-if="data.item.desired_status === 'Stopped' && pods[data.item.user_id].user_id === data.item.user_id" v-model="pods[data.item.user_id].instanceType" :options="instanceOptions"></b-form-select>
+                  <b-form-select style="width: 75px;" v-if="data.item.desired_status === 'Stopped' && pods[data.item.user_id].user_id === data.item.user_id" v-model="pods[data.item.user_id].instanceType" :options="instanceOptions"></b-form-select>
                 </template>
-                <template slot="HEAD_acc_runtime_cpu" slot-scope="HEAD_acc_runtime_cpu">
+                <template v-slot:head(acc_runtime_cpu)="acc_runtime_cpu">
                   Runtime CPU
                 </template>
-                <template slot="HEAD_acc_runtime_gpu" slot-scope="HEAD_acc_runtime_gpu">
+                <template v-slot:head(acc_runtime_gpu)="acc_runtime_gpu">
                   Runtime GPU
                 </template>
-                <template slot="HEAD_pod" slot-scope="pod">
+                <template v-slot:head(pod)="pod">
 
                 </template>
-                <template slot="pod" slot-scope="data">
+                <template v-slot:cell(pod)="data">
                   <span style="white-space: nowrap;" v-if="data.item.desired_status === 'Stopped'">
                     <a v-if="!pods[data.item.user_id].statusLoading && !pods[data.item.user_id].processorSelected || pods[data.item.user_id].user_id !== data.item.user_id" class="mr-2" :id="`start-pod-${data.item.user_id}`" @click="startPod($event, data.item)">
                       <i class="fas fa-play text-warning"></i>
@@ -109,18 +109,18 @@
                   </span>
                   <b-spinner v-if="pods[data.item.user_id].statusLoading && pods[data.item.user_id].user_id === data.item.user_id" variant="primary" type="grow" small label="Spinning"></b-spinner>
                 </template>
-                <template slot="HEAD_actions" slot-scope="actions">
+                <template v-slot:head(actions)="actions">
 
                 </template>
-                <template slot="actions" slot-scope="data">
+                <template v-slot:cell(actions)="data">
                   <span style="white-space: nowrap;">
-                    <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.update-registration-modal>
+                    <a class="mr-2" @click="selectRegistration($event, data.item); $bvModal.show('update-registration-modal')">
                       <i class="fas fa-edit text-primary"></i>
                     </a>
-                    <a class="mr-2" @click="selectRegistration($event, data.item)" v-b-modal.delete-registration-modal>
+                    <a class="mr-2" @click="selectRegistration($event, data.item); $bvModal.show('delete-registration-modal')" v-b-modal.delete-registration-modal>
                       <i class="fas fa-trash-alt text-danger"></i>
                     </a>
-                    <a class="mr-2" v-if="data.item.provider === 'Email'" @click="selectRegistration($event, data.item)" v-b-modal.change-password-modal>
+                    <a class="mr-2" v-if="data.item.provider === 'Email'" @click="selectRegistration($event, data.item); $bvModal.show('change-password-modal')">
                       <i class="fas fa-lock text-secondary"></i>
                     </a>
                   </span>

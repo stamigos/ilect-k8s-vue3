@@ -43,11 +43,12 @@
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
                 @row-clicked="handleCourseClicked"
+                show-empty
               >
-                <template slot="notifications">
+                <template v-slot:cell(notifications)="notifications">
                     <i class="far fa-bell"></i>
                 </template>
-                <template slot="actions" slot-scope="data">
+                <template v-slot:cell(actions)="data">
                     <a class="mr-2" @click="selectCourse($event, data.item)" v-b-modal.update-course-modal>
                       <i class="fas fa-edit text-primary"></i>
                     </a>
@@ -122,9 +123,9 @@
                       label-for="form-duration-input">
             <b-form-select v-model="form.duration" :options="durations"></b-form-select>
         </b-form-group>
-        <b-form-group id="form-duration-group"
+        <b-form-group id="form-is-gpu-selectable-group"
                       label="Is GPU selectable:"
-                      label-for="form-duration-input">
+                      label-for="form-is-gpu-selectable-input">
             <b-form-select v-model="form.is_gpu_selectable" :options="is_gpu_selectable_variants"></b-form-select>
         </b-form-group>
         <b-button type="submit" class="mr-3" variant="primary">Submit</b-button>

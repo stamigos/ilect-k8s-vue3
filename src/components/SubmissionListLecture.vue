@@ -38,17 +38,17 @@
               :sort-desc.sync="sortDesc"
               @row-clicked="rowClicked"
             >
-              <template slot="HEAD_score_all" slot-scope="score_all">
+              <template v-slot:head(score_all)="score_all">
                 <b-button variant="primary" size="sm" @click="scoreUserAll">Score All</b-button>
               </template>
-              <template slot="score_all" slot-scope="score_all">
+              <template v-slot:cell(score_all)="score_all">
                   <b-button variant="primary" size="sm" @click="scoreUser(score_all.item)">Score</b-button>
               </template>
 
-              <template slot="HEAD_scoring_status" slot-scope="scoring_status">
+              <template v-slot:head(scoring_status)="scoring_status">
                 Scoring Result
               </template>
-              <template slot="scoring_status" slot-scope="data">
+              <template v-slot:cell(scoring_status)="data">
                 <b-row>
                   <b-col>
                     <span v-if="scoringStatuses[data.item.id]">{{ scoringStatuses[data.item.id] }}</span>

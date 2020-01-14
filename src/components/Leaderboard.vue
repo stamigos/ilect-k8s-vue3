@@ -22,10 +22,10 @@
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
               >
-              <template slot="HEAD_crown" slot-scope="data">
+              <template v-slot:head(crown)="crown">
                 <span></span>
               </template>
-                <template slot="crown" slot-scope="data">
+                <template v-slot:cell(crown)="data">
                   <i class="fas fa-crown" :style="{color: data.item.color}"></i>
                 </template>
               </b-table>
