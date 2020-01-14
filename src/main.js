@@ -11,7 +11,7 @@ import VueCookies from 'vue-cookies'
 import createPersistedState from 'vuex-persistedstate'
 import VueRouterPermissions from 'vue-router-permissions'
 import VueSocketIO from 'vue-socket.io'
-
+import CircularCountDownTimer from 'vue-circular-count-down-timer'
 // eslint-disable-next-line
 import jQuery from 'jquery'
 
@@ -29,6 +29,7 @@ Vue.use(Vuex)
 Vue.use(VueCookies)
 
 Vue.use(VueRouterPermissions, router)
+Vue.use(CircularCountDownTimer)
 
 const options = { path: '/socket.io/' } // Options object to pass into SocketIO
 

@@ -34,7 +34,6 @@
           <div class="editor-submission">
             <editor id="editor" v-model="content" @init="editorInit" lang="python" theme="dracula" width="750px" height="300px"></editor>
           </div>
-          <!-- <button class="btn btn-info button-submission" v-on:click="addSubmission">Save</button> -->
         </div>
       </div>
     </div>
