@@ -142,7 +142,8 @@ export default {
       runningStateStart: false,
       runningStateStop: false,
       runningState: false,
-      stopTimer: true
+      stopTimer: true,
+      timeout: false
     }
   },
   mounted () {
@@ -185,8 +186,10 @@ export default {
           }, 3000)
         })
         var self = this
+        var counter = 0
         var timerId = setInterval(() => {
           PodService.findStatus(self.courseId, (podRes) => {
+            counter += 1
             self.podStatus = podRes.data.pod_status
             if (podRes.data.pod_status === 'Running') {
               self.isLoadingStart = false
@@ -194,6 +197,13 @@ export default {
               self.runningState = false
               self.stopTimer = false
               clearInterval(timerId)
+            }
+            if (counter === 1) {
+              clearInterval(timerId)
+              self.isLoadingStart = false
+              self.errorFlag = true
+              self.timeout = true
+              self.errorMessage = 'Pod Timeout'
             }
           }, (error) => {
             self.isLoadingStart = false
@@ -204,6 +214,13 @@ export default {
             self.errorMessage = error.response.data.reason
             console.error(error)
             clearInterval(timerId)
+            if (counter === 1) {
+              clearInterval(timerId)
+              self.isLoadingStart = false
+              self.errorFlag = true
+              self.timeout = true
+              self.errorMessage = 'Pod Timeout'
+            }
           })
         }, 3000)
       }, (error) => {
@@ -223,6 +240,7 @@ export default {
           this.routes = routeRes.data
         })
         var self = this
+        var counter = 0
         var timerId = setInterval(() => {
           PodService.findStatus(this.courseId, (podRes) => {
             console.log(podRes)
@@ -236,6 +254,13 @@ export default {
               window.location.reload()
               clearInterval(timerId)
             }
+            if (counter === 1) {
+              clearInterval(timerId)
+              self.isLoadingStop = false
+              self.errorFlag = true
+              self.timeout = true
+              self.errorMessage = 'Pod Timeout'
+            }
           }, (error) => {
             self.isLoadingStop = false
             self.runningStateStop = false
@@ -243,6 +268,14 @@ export default {
             self.errorFlag = true
             self.errorMessage = error.response.data.reason
             console.error(error)
+            clearInterval(timerId)
+            if (counter === 1) {
+              clearInterval(timerId)
+              self.isLoadingStop = false
+              self.errorFlag = true
+              self.timeout = true
+              self.errorMessage = 'Pod Timeout'
+            }
           })
         }, 3000)
       }, (error) => {
@@ -287,6 +320,7 @@ export default {
             { value: 1, text: 'GPU' }
           ]
         } else {
+          this.instanceType = 0
           this.instanceOptions = [
             { value: 0, text: 'CPU' }
           ]
