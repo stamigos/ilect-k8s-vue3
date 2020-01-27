@@ -48,7 +48,7 @@
           <hr>
           <b-row class="col-sm-3">
             <b-col>
-              <b-form-select style="width: 100px;" v-model="updateRegistrationForm.duration" :options="extendOptions"></b-form-select>
+              <b-form-select style="width: 100px;" v-model="duration" :options="extendOptions"></b-form-select>
               <br>
               <button class="btn btn-info btn-md mt-3" v-on:click="extend">Extend</button>
             </b-col>
@@ -119,9 +119,7 @@ export default {
       courseId: '',
       routes: [],
       podStatus: {},
-      updateRegistrationForm: {
-        duration: 20
-      },
+      duration: 20,
       extendOptions: [
         { value: 10, text: '10 min' },
         { value: 20, text: '20 min' },
@@ -198,7 +196,7 @@ export default {
               self.stopTimer = false
               clearInterval(timerId)
             }
-            if (counter === 1) {
+            if (counter === 20) {
               clearInterval(timerId)
               self.isLoadingStart = false
               self.errorFlag = true
@@ -214,7 +212,7 @@ export default {
             self.errorMessage = error.response.data.reason
             console.error(error)
             clearInterval(timerId)
-            if (counter === 1) {
+            if (counter === 20) {
               clearInterval(timerId)
               self.isLoadingStart = false
               self.errorFlag = true
@@ -243,6 +241,7 @@ export default {
         var counter = 0
         var timerId = setInterval(() => {
           PodService.findStatus(this.courseId, (podRes) => {
+            counter += 1
             console.log(podRes)
             self.podStatus = podRes.data.pod_status
             console.log(podRes)
@@ -254,7 +253,7 @@ export default {
               window.location.reload()
               clearInterval(timerId)
             }
-            if (counter === 1) {
+            if (counter === 20) {
               clearInterval(timerId)
               self.isLoadingStop = false
               self.errorFlag = true
@@ -269,7 +268,7 @@ export default {
             self.errorMessage = error.response.data.reason
             console.error(error)
             clearInterval(timerId)
-            if (counter === 1) {
+            if (counter === 20) {
               clearInterval(timerId)
               self.isLoadingStop = false
               self.errorFlag = true
@@ -332,12 +331,13 @@ export default {
     extend (evt) {
       evt.preventDefault()
       const params = {
-        duration: this.updateRegistrationForm.duration
+        duration: this.duration
       }
       CourseService.extendDeadline(this.courseId, params, (response) => {
         console.log(response)
         this.showAlert = true
         this.alertMessage = 'Deadline successfully extended!'
+        window.location.reload()
       }, (error) => {
         console.error(error)
       })
