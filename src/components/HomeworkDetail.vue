@@ -29,7 +29,7 @@
                     variant="info"
                     style="float:right;"
                     @click="goToLeaderBoard($event)"
-                    v-if="submission && assignment_show_lb === true">
+                    v-if="assignment_show_lb === true">
               Go to LeaderBoard >
           </b-button>
           <p class="text-secondary header">Assignment name</p>

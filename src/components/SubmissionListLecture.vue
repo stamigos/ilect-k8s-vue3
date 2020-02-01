@@ -7,20 +7,25 @@
         <div class="container">
           <p class="text-secondary header">Assignment name</p>
           <p>{{assignment_name}}</p>
-          <div class="col-sm-6 p-0">
-            <b-input-group>
-              <b-form-input id="form-search-input"
-                     type="text"
-                     name="search"
-                     v-model="searchUser"
-                     autocomplete="off"
-                     placeholder="Search Registration Name">
-              </b-form-input>
-              <b-input-group-append>
-                <b-button disabled="disabled"><i class="fas fa-search"></i></b-button>
-              </b-input-group-append>
-            </b-input-group>
-          </div>
+          <b-row class="col-sm-8 p-0">
+            <b-col>
+              <b-input-group>
+                <b-form-input id="form-search-input"
+                         type="text"
+                         name="search"
+                         v-model="searchUser"
+                         autocomplete="off"
+                         placeholder="Search Registration Name">
+                  </b-form-input>
+                  <b-input-group-append>
+                    <b-button disabled="disabled"><i class="fas fa-search"></i></b-button>
+                  </b-input-group-append>
+              </b-input-group>
+            </b-col>
+            <b-col>
+              <b-button type="button" variant="outline-info" @click="downloadCSV">Download CSV</b-button>
+            </b-col>
+          </b-row>
           <div class="pt-3">
             <div class="alert alert-dismissible alert-success" v-show="scoreSuccess">
               <button type="button" class="close" @click="scoreSuccess = null">&times;</button>
@@ -168,6 +173,9 @@ export default {
         this.errorMessage = error
         console.error(error)
       })
+    },
+    downloadCSV () {
+      ScoreService.downloadScoringCSV(this.courseId, this.assignmentId)
     }
   },
   created () {
