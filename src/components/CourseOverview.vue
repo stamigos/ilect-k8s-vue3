@@ -196,7 +196,7 @@ export default {
               self.stopTimer = false
               clearInterval(timerId)
             }
-            if (counter === 20) {
+            if (counter === 400) {
               clearInterval(timerId)
               self.isLoadingStart = false
               self.errorFlag = true
@@ -212,7 +212,7 @@ export default {
             self.errorMessage = error.response.data.reason
             console.error(error)
             clearInterval(timerId)
-            if (counter === 20) {
+            if (counter === 400) {
               clearInterval(timerId)
               self.isLoadingStart = false
               self.errorFlag = true
@@ -253,7 +253,7 @@ export default {
               window.location.reload()
               clearInterval(timerId)
             }
-            if (counter === 20) {
+            if (counter === 400) {
               clearInterval(timerId)
               self.isLoadingStop = false
               self.errorFlag = true
@@ -268,7 +268,7 @@ export default {
             self.errorMessage = error.response.data.reason
             console.error(error)
             clearInterval(timerId)
-            if (counter === 20) {
+            if (counter === 400) {
               clearInterval(timerId)
               self.isLoadingStop = false
               self.errorFlag = true
