@@ -193,7 +193,7 @@ export default {
       CourseService.addSubmission(this.courseId, this.assignmentId, params, (response) => {
         console.log(response)
         if (response.data.status === 'ok') {
-          this.successMessage = 'Assignment submited!'
+          this.successMessage = 'Assignment submitted!'
         }
       }, (error) => {
         this.errorMessage = error
