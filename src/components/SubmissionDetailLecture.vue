@@ -78,6 +78,7 @@ export default {
     return {
       courseId: '',
       assignmentId: '',
+      submissionId: '',
       content: '',
       assignment_name: null,
       submission: {
@@ -94,7 +95,7 @@ export default {
   },
   methods: {
     loadSubmission () {
-      CourseService.findSubmission(this.courseId, this.assignmentId, (response) => {
+      CourseService.findSubmissionByLecturer(this.courseId, this.assignmentId, this.submissionId, (response) => {
         console.log(response)
         this.content = response.data.payload.submission.content
         this.submission.score = response.data.payload.submission.score
@@ -189,6 +190,7 @@ export default {
   created () {
     this.courseId = this.$route.params.courseId
     this.assignmentId = this.$route.params.assignmentId
+    this.submissionId = this.$route.params.submissionId
     this.loadSubmission()
   }
 }

@@ -158,6 +158,14 @@ export default {
       errorHandler(error)
     })
   },
+  findSubmissionByLecturer: function (courseId, assignmentId, submissionId, callback, errorHandler) {
+    const targetPath = `/courses/${courseId}/assignments/${assignmentId}/submissions/${submissionId}`
+    ApiClient.search(targetPath, (response) => {
+      callback(response)
+    }, (error) => {
+      errorHandler(error)
+    })
+  },
   addSubmission: function (courseId, assignmentId, params, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/assignments/${assignmentId}/submissions`
     ApiClient.create(targetPath, params, (response) => {
