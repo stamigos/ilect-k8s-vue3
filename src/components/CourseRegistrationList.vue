@@ -43,6 +43,9 @@
                   <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info" v-b-modal.registration-modal>Add Registration</b-button>
                 </b-col>
                 <b-col>
+                  <b-button type="button" variant="outline-info" @click="downloadCSV">Download CSV</b-button>
+                </b-col>
+                <b-col>
                   <b-dropdown id="dropdown-buttons" text="Upload CSV..." variant="outline-info" class="m-2" style="margin:0 !important;">
                     <b-dropdown-item-button>
                       <b-button v-if="user.role === 'lecturer'" type="button" variant="outline-info" @click="$refs.fileGithub.click()">Github Users
@@ -516,6 +519,9 @@ export default {
         this.pods = { ...this.pods }
         console.error(error)
       })
+    },
+    downloadCSV () {
+      CourseService.downloadCourseRegistrationsCSV(this.courseId)
     }
   },
   created () {

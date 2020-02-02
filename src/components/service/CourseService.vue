@@ -178,6 +178,10 @@ export default {
     const targetPath = `${process.env.VUE_APP_API_BASE_URL}/courses/${courseId}/assignments/${assignmentId}/submissions/download-csv`
     window.open(targetPath)
   },
+  downloadCourseRegistrationsCSV: function (courseId, registrationId, callback, errorHandler) {
+    const targetPath = `${process.env.VUE_APP_API_BASE_URL}/courses/${courseId}/registrations/download-csv`
+    window.open(targetPath)
+  },
   uploadSubmissionCSV: function (courseId, assignmentId, file, callback, errorHandler) {
     const targetPath = `/courses/${courseId}/assignments/${assignmentId}/submissions/upload-submission-csv`
     ApiClient.uploadFromCSVFile(targetPath, file, (response) => {
