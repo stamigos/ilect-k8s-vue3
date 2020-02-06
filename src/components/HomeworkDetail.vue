@@ -51,6 +51,7 @@
             <b-button variant="info"
                       class="mr-3"
                       v-if="!rejected && !assignmentExpired || submission && submission.late_submit === 'Approved'"
+                      v-show="submission && submission.content_shortened !== true"
                       v-on:click="createUpdateSubmission">
                     Save
             </b-button>
@@ -121,6 +122,7 @@ export default {
           this.submission.last_scored_time = response.data.payload.submission.last_scored_time
           this.submission.late_submit = response.data.payload.submission.late_submit
           this.submission.late_submit_due_date = response.data.payload.submission.late_submit_due_date
+          this.submission.content_shortened = response.data.payload.submission.content_shortened
           this.checkDeadline(this.submission.late_submit)
           this.isPermissionRequested = this.submission.late_submit === 'Requested'
         }
