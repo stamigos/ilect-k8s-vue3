@@ -123,6 +123,11 @@ export default {
           this.submission.late_submit = response.data.payload.submission.late_submit
           this.submission.late_submit_due_date = response.data.payload.submission.late_submit_due_date
           this.submission.content_shortened = response.data.payload.submission.content_shortened
+          if (this.submission.content_shortened === true) {
+            this.successMessage = 'This submission is too long, we show shortened version, if you want to modify please upload csv again, you can also download csv'
+          } else {
+            this.successMessage = false
+          }
           this.checkDeadline(this.submission.late_submit)
           this.isPermissionRequested = this.submission.late_submit === 'Requested'
         }
