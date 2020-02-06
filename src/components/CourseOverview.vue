@@ -417,6 +417,7 @@ export default {
 </style>
 <style>
   .rest-time #wrapper {
+    display: inline !important;
     justify-content: left !important;
   }
   .rest-time #container .item {
